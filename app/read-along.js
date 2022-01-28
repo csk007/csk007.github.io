@@ -197,6 +197,9 @@ var ReadAlong = {
             var i = e.target.dataset.index;
             that.audio_element.currentTime = that.words[i].begin + 0.01; //Note: times apparently cannot be exactly set and sometimes select too early
             that.selectCurrentWord();
+			if (that.audio_element.paused) {
+                    that.audio_element.play();
+            }
         }
         that.text_element.addEventListener('click', on_select_word_el, false);
         that.text_element.addEventListener('keypress', function (e) {
