@@ -1,0 +1,99 @@
+
+html {
+    background: #000;
+    font-family: Verdana, sans-serif;
+}
+body {
+    background: white;
+    padding: 1em;
+    border-radius: 1em;
+}
+a {
+    color: #0E2560;
+}
+h2 {
+    margin-bottom: 1em;
+}
+.passage-audio {
+    height: 1em;
+}
+#passage-audio {
+    width: 100%;
+    max-height: 2em;
+}
+#passage-text.speaking {
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.autofocus-current-word,
+.playback-rate {
+    font-size: smaller;
+}
+.autofocus-current-word label,
+.playback-rate label {
+    font-weight: bold;
+}
+q {
+    quotes: "“" "”" "‘" "’";
+}
+.section-heading {
+    display: none;
+}
+.passage p {
+    line-height: 1.4em;
+}
+.verse-start {
+    line-height: 0;
+}
+.initialized span[data-begin]:focus,
+.initialized span[data-begin]:hover {
+    background-color: #FFFF25;
+    box-shadow: 0px 0px 4px #FFFFCA;
+}
+.initialized span[data-begin].speaking {
+    background-color: yellow;
+    box-shadow: 0px 0px 4px yellow;
+}
+.initialized span[data-begin] {
+    cursor: pointer;
+}
+.error {
+    color: red;
+}
+
+article > footer {
+    border-top: solid 1px red;
+    padding-top: 0.3em;
+    margin-top: 0.3em;
+}
+
+footer {
+    margin-bottom: 0.5em;
+    line-height: 1.4em;
+    font-size: small;
+}
+footer img {
+    vertical-align: text-bottom;
+}
+
+
+body {
+  border-color: #660000;
+  border-width: thin;
+  margin: 0;
+  padding: 5;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: normal;
+  font-size-adjust: none;
+  font-stretch: normal;
+  color: #000000;
+  text-align: left;
+  line-height: normal;
+  background-color: white;
+  font-size: 2.0em;
+
+
+/* Dr. Mike Beutner, Instructional Technology, University of Louisiana at Monroe,   beutner "at" ulm.edu   */
