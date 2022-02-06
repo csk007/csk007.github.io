@@ -20,12 +20,17 @@ h2 {
 #passage-audio {
     width: 100%;
     max-height: 2em;
+	position:fixed;
+	left:0px;
+	top: 5px;
 }
+
 #passage-text.speaking {
     -moz-user-select: none;
     -webkit-user-select: none;
     -ms-user-select: none;
     user-select: none;
+	color: black;
 }
 .autofocus-current-word,
 .playback-rate {
@@ -43,22 +48,59 @@ q {
 }
 .passage p {
     line-height: 1.4em;
+	color: #999;
 }
 .verse-start {
     line-height: 0;
 }
 .initialized span[data-begin]:focus,
 .initialized span[data-begin]:hover {
-    background-color: #FFFF25;
+    background-color: #ffffcc;
     box-shadow: 0px 0px 4px #FFFFCA;
 }
 .initialized span[data-begin].speaking {
-    background-color: yellow;
-    box-shadow: 0px 0px 4px yellow;
+    background-color: #33FFCC; /*22EEBB;*/
+    box-shadow: 0px 0px 4px #0C9;
 }
 .initialized span[data-begin] {
     cursor: pointer;
 }
+
+.hide-text{
+    color: white;
+}
+
+.float{
+	margin-top: 14px;
+}
+
+.play-pause-float{
+	position:fixed;
+	width:60px;
+	height:60px;
+	bottom:40px;
+	right: 40px;
+	background-color:#0C9;
+	color:#FFF;
+	border-radius:50px;
+	text-align:center;
+	box-shadow: 2px 2px 3px #999;
+}
+
+
+.learn-mode-float{
+	position:fixed;
+	width:60px;
+	height:60px;
+	bottom:40px;
+	left: 40px;
+	background-color:#0C9;
+	color:#FFF;
+	border-radius:50px;
+	text-align:center;
+	box-shadow: 2px 2px 3px #999;
+}
+
 .error {
     color: red;
 }
@@ -78,6 +120,28 @@ footer img {
     vertical-align: text-bottom;
 }
 
+input[type=checkbox]
+{
+  /* Double-sized Checkboxes */
+  -ms-transform: scale(2); /* IE */
+  -moz-transform: scale(2); /* FF */
+  -webkit-transform: scale(2); /* Safari and Chrome */
+  -o-transform: scale(2); /* Opera */
+  transform: scale(2);
+  padding: 10px;
+}
+
+/* Might want to wrap a span around your checkbox text */
+.checkboxtext
+{
+  /* Checkbox text */
+  font-size: 110%;
+  display: inline;
+}
+
+.extra{
+color: #CCC;	
+}
 
 body {
   border-color: #660000;
@@ -89,7 +153,7 @@ body {
   font-weight: normal;
   font-size-adjust: none;
   font-stretch: normal;
-  color: #000000;
+  color: #000;
   text-align: left;
   line-height: normal;
   background-color: white;

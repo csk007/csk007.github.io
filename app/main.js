@@ -4,7 +4,11 @@ window.addEventListener('load', function (e) {
         var args = {
             text_element: document.getElementById('passage-text'),
             audio_element: document.getElementById('passage-audio'),
-            autofocus_current_word: document.getElementById('autofocus-current-word').checked
+			autopause_learn_mode_element: document.getElementById('autopause-learn-mode'),
+			learn_mode_btn_element: document.getElementById('learn-mode-btn'),
+			play_pause_btn_element: document.getElementById('play-pause-btn'),
+            autofocus_current_word: document.getElementById('autofocus-current-word').checked,
+			autopause_learn_mode: document.getElementById('autopause-learn-mode').checked
         };
 
         if (!args.audio_element.canPlayType) {

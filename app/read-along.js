@@ -7,8 +7,11 @@
 var ReadAlong = {
     text_element: null,
     audio_element: null,
+	autopause_learn_mode_element: null,
+	learn_mode_btn_element: null,
+	play_pause_btn_element: null,
     autofocus_current_word: true,
-
+	autopause_learn_mode: false,
     words: [],
 
     init: function (args) {
@@ -33,6 +36,7 @@ var ReadAlong = {
                 'begin': parseFloat(word_el.dataset.begin),
                 'dur': parseFloat(word_el.dataset.dur),
 				'end': parseFloat(word_el.dataset.end),
+				'autopause': ('autopause' in word_el.dataset),
                 'element': word_el
             };
 			
@@ -148,7 +152,11 @@ var ReadAlong = {
                 clearTimeout(this._current_next_select_timeout_id);
                 this._current_next_select_timeout_id = setTimeout(
                     function () {
-                        that.selectCurrentWord();
+						if (that.autopause_learn_mode && next_word.autopause){
+							that.audio_element.pause();
+						}else {
+							that.selectCurrentWord();
+						}
                     },
                     Math.max(seconds_until_next_word_begins * 1000, 0)
                 );
@@ -164,7 +172,28 @@ var ReadAlong = {
             spoken_word_el.classList.remove('speaking');
         });
     },
+	
+	learnModeEnable: function() {
+		var that = this;
+		that.learn_mode_btn_element.classList.remove('fa-eye');
+		that.learn_mode_btn_element.classList.add('fa-eye-slash');
+		var learnmode_word_els = this.text_element.querySelectorAll('span[data-learnmode]');
+        Array.prototype.forEach.call(learnmode_word_els, function (learnmode_word_el) {
+            learnmode_word_el.classList.add('hide-text');
+        });
+	
+	},	
 
+	learnModeDisable: function() {
+		var that = this;
+		that.learn_mode_btn_element.classList.remove('fa-eye-slash');
+		that.learn_mode_btn_element.classList.add('fa-eye');
+		var learnmode_word_els = this.text_element.querySelectorAll('span[data-learnmode]');
+        Array.prototype.forEach.call(learnmode_word_els, function (learnmode_word_el) {
+            learnmode_word_el.classList.remove('hide-text');
+        });
+	
+	},
 
     addEventListeners: function () {
         var that = this;
@@ -175,14 +204,47 @@ var ReadAlong = {
         that.audio_element.addEventListener('play', function (e) {
             that.selectCurrentWord();
             that.text_element.classList.add('speaking');
+			that.play_pause_btn_element.classList.remove('fa-play');
+			that.play_pause_btn_element.classList.add('fa-pause');			
+
         }, false);
 
         /**
          * Abandon seeking the next word because we're paused
          */
         that.audio_element.addEventListener('pause', function (e) {
-            that.selectCurrentWord(); // We always want a word to be selected
+            //that.selectCurrentWord(); // We always want a word to be selected
             that.text_element.classList.remove('speaking');
+			that.play_pause_btn_element.classList.remove('fa-pause');
+			that.play_pause_btn_element.classList.add('fa-play');
+
+        }, false);
+		
+
+		
+
+		
+		that.play_pause_btn_element.addEventListener('click', function (e) {
+			e.preventDefault();
+			//e.stopPropagation();
+            if (that.audio_element.paused) {
+                    that.audio_element.play();
+            } else {
+                    that.audio_element.pause();
+            }
+        }, false);
+		
+		
+		that.autopause_learn_mode_element.addEventListener('change', function (e) {
+			that.autopause_learn_mode = that.autopause_learn_mode_element.checked;
+			that.autopause_learn_mode ? that.learnModeEnable() : that.learnModeDisable();
+        }, false);
+		
+		that.learn_mode_btn_element.addEventListener('click', function (e) {
+			e.preventDefault();
+			//e.stopPropagation();
+            that.autopause_learn_mode  = !that.autopause_learn_mode;
+			that.autopause_learn_mode ? that.learnModeEnable() : that.learnModeDisable();
         }, false);
 
         /**
@@ -216,8 +278,7 @@ var ReadAlong = {
                 e.preventDefault();
                 if (that.audio_element.paused) {
                     that.audio_element.play();
-                }
-                else {
+                } else {
                     that.audio_element.pause();
                 }
             }
@@ -228,7 +289,7 @@ var ReadAlong = {
          * here then causes it to play.
          * @todo Should it stop playing once the duration is over?
          */
-        that.text_element.addEventListener('dblclick', function (e) {
+        that.text_element.addEventListener('DISABLEDdblclick', function (e) {
             e.preventDefault();
             that.audio_element.play();
         }, false);
