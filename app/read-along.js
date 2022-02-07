@@ -101,6 +101,29 @@ var ReadAlong = {
 
     _current_end_select_timeout_id: null,
     _current_next_select_timeout_id: null,
+	
+	stepTime : 20,
+	docBody : document.body,
+	focElem : document.documentElement,
+
+	scrollAnimationStep: function (initPos, stepAmount) {
+		var that = this;
+		var newPos = initPos - stepAmount > 0 ? initPos - stepAmount : 0;
+		document.body.scrollTop = document.documentElement.scrollTop = newPos;
+		newPos && setTimeout(function () {
+			that.scrollAnimationStep(newPos, stepAmount);
+		}, that.stepTime);
+	},
+
+	scrollTopAnimated: function (speed) {
+		var that = this;
+		var topOffset = document.body.scrollTop || document.documentElement.scrollTop;
+		var stepAmount = topOffset;
+		console.log(topOffset);
+		speed && (stepAmount = (topOffset * that.stepTime)/speed);
+
+			that.scrollAnimationStep(topOffset, stepAmount);
+	},
 
     /**
      * Select the current word and set timeout to select the next one if playing
@@ -115,6 +138,14 @@ var ReadAlong = {
             current_word.element.classList.add('speaking');
             if (this.autofocus_current_word) {
                 current_word.element.focus();
+					var center = screen.height/2;
+					var top = current_word.element.offsetTop ;
+					console.log(top,center);
+					if (top > center){
+						window.scrollTo({top: top-center+50, behavior: 'smooth'});
+						//document.body.scrollTop = document.documentElement.scrollTop = top-center;		
+					}
+					//that.scrollTopAnimated(500);
             }
         }
 

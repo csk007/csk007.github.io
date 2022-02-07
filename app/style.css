@@ -141,6 +141,8 @@ input[type=checkbox]
 
 .extra{
 color: #CCC;	
+font-size: 70%;
+
 }
 
 body {
@@ -157,7 +159,7 @@ body {
   text-align: left;
   line-height: normal;
   background-color: white;
-  font-size: 2.0em;
+  font-size: 1.9em;
 
 
 /* Dr. Mike Beutner, Instructional Technology, University of Louisiana at Monroe,   beutner "at" ulm.edu   */
