@@ -13,6 +13,8 @@ var ReadAlong = {
     autofocus_current_word: true,
 	autopause_learn_mode: false,
     words: [],
+	// The wake lock sentinel.
+	wakeLock: null,
 
     init: function (args) {
         var name;
@@ -236,7 +238,21 @@ var ReadAlong = {
             that.selectCurrentWord();
             that.text_element.classList.add('speaking');
 			that.play_pause_btn_element.classList.remove('fa-play');
-			that.play_pause_btn_element.classList.add('fa-pause');			
+			that.play_pause_btn_element.classList.add('fa-pause');	
+
+
+			// Function that attempts to request a wake lock.
+			const requestWakeLock = async () => {
+			  try {
+				that.wakeLock = await navigator.wakeLock.request('screen');
+				that.wakeLock.addEventListener('release', () => {
+				  console.log('Wake Lock was released');
+				});
+				console.log('Wake Lock is active');
+			  } catch (err) {
+				console.error(`${err.name}, ${err.message}`);
+			  }
+			};
 
         }, false);
 
@@ -248,6 +264,18 @@ var ReadAlong = {
             that.text_element.classList.remove('speaking');
 			that.play_pause_btn_element.classList.remove('fa-pause');
 			that.play_pause_btn_element.classList.add('fa-play');
+			// Function that attempts to release the wake lock.
+			const releaseWakeLock = async () => {
+			  if (!that.wakeLock) {
+				return;
+			  }
+			  try {
+				await that.wakeLock.release();
+				that.wakeLock = null;
+			  } catch (err) {
+				console.error(`${err.name}, ${err.message}`);
+			  }
+			};
 
         }, false);
 		
