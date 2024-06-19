@@ -13,8 +13,7 @@
     <!--<link href="https://www.jqueryscript.net/demo/emoji-picker-twemoji/css/emojis.css"  rel="stylesheet">-->
     <style>
     .card-img-top{
-      height:125px;
-      width:125px;
+      max-height:350px;
     }
 
     .highlight-text{
@@ -52,7 +51,7 @@
               Kumarans | DKS | T Shirt Info: <span id="refresh-timer" class="pull-right"></span>
             </div>
             <div class="card-body">
-              <div class="container">
+              <div class="container mx-0 px-0">
                 <div class="row wednesdays-info-grid">
                   <!--<div class="wednesdays-info-grid"></div>-->
                 </div>
@@ -210,7 +209,7 @@ function getWednesdaysOfMonth(month = 0) {
 function renderWednesdaysGridInfo(){
       //console.log("renderWednesdaysGridInfo: ",window.wednesdays);
       var today = new Date().toLocaleDateString("en-IN", options2);
-      var htmlStr ='<div class="col-8 col-md-8 col-sm-8">Today: <br/>' +today+'<hr/>Upcoming: <br/><span class="highlight-text">'+nextWedStr + '</span><hr/>Wednesday Of The Month: <br/><span class="highlight-text">' +nextWedOrd+'</span><hr/>T Shirt: <br/><span class="highlight-text-cap">'+nextWedTshirt+'</span></div><div class="col-4 col-md-4 col-sm-4"><br/><img class="card-img-top img-responsive" style="margin: 0 auto;" alt="'+nextWedTshirt+'" src="'+nextWedTshirtImg+'"></div>';
+      var htmlStr ='<div class="col-8 col-md-8 col-sm-8">Today: <br/>' +today+'<hr/>Upcoming: <br/><span class="highlight-text">'+nextWedStr + '</span><hr/>Wednesday Of The Month: <br/><span class="highlight-text">' +nextWedOrd+'</span><hr/>T Shirt: <br/><span class="highlight-text-cap">'+nextWedTshirt+'</span></div><div class="col-4 col-md-4 col-sm-4"><br/><img class="img-fluid card-img-top img-responsiveDIS" style="margin: 0 auto;" alt="'+nextWedTshirt+'" src="'+nextWedTshirtImg+'"></div>';
 
       $(".wednesdays-info-grid").empty();
       $(".wednesdays-info-grid").append(htmlStr);
