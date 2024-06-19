@@ -12,10 +12,19 @@
     <link href="https://lonekorean.github.io/highlight-within-textarea/jquery.highlight-within-textarea.css"   rel="stylesheet">
     <!--<link href="https://www.jqueryscript.net/demo/emoji-picker-twemoji/css/emojis.css"  rel="stylesheet">-->
     <style>
-      .card-img-top{
-  height:200px;
-  width:200px;
-}
+    .card-img-top{
+      height:200px;
+      width:200px;
+    }
+
+    .highlight-text{
+      color: blue;
+    }
+
+    .highlight-text-cap{
+      color: blue;
+      text-transform: uppercase;
+    }    
     </style>
 </head>
 <body style="font-weight:600">
@@ -34,7 +43,8 @@
   </div>
 </nav>
 <br/>-->
-<div class="container">
+<div class="container-fluid">
+    <br/>
     <div class="row">
     <div class="col-12">
           <div class="card">
@@ -84,7 +94,7 @@
               <div class="container">
                 <div class="row">
                   <div class="wednesdays-dev-info-grid">
-                    Feedback / Suggestions: Ansh 2C / Chandrashekar SK | csk007@gmail.com 
+                    Feedback / Suggestions: Chandrashekar SK (Ansh - 2C) | csk007@gmail.com 
                   </div>
                 </div>
               </div>
@@ -97,27 +107,6 @@
   <br/>
 
     <br/>
-
-<audio id="notify1">
-  <source src="https://cdn.pixabay.com/audio/2022/12/13/audio_661aff279e.mp3" type="audio/mpeg">
-  Your browser does not support the audio element.
-</audio>
-<audio id="notify2">
-  <source src="https://cdn.pixabay.com/audio/2021/08/04/audio_12b0c7443c.mp3" type="audio/mpeg">
-  Your browser does not support the audio element.
-</audio>
-<audio id="notify3">
-  <source src="https://cdn.pixabay.com/audio/2022/11/13/audio_a5bc07904a.mp3" type="audio/mpeg">
-  Your browser does not support the audio element.
-</audio>
-<audio id="notify4">
-  <source src="https://cdn.pixabay.com/audio/2022/11/20/audio_4d2cc8231f.mp3" type="audio/mpeg">
-  Your browser does not support the audio element.
-</audio>
-<audio id="notify5">
-  <source src="https://cdn.pixabay.com/audio/2022/03/21/audio_7b23a10981.mp3" type="audio/mpeg">
-  Your browser does not support the audio element.
-</audio>
 
 
 </div>
@@ -221,7 +210,7 @@ function getWednesdaysOfMonth(month = 0) {
 function renderWednesdaysGridInfo(){
       //console.log("renderWednesdaysGridInfo: ",window.wednesdays);
       var today = new Date().toLocaleDateString("en-IN", options2);
-      var htmlStr ='<div class="col-8">Today&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;&nbsp;&nbsp;' +today+'<hr/>Next Wed&nbsp;&nbsp;: &nbsp;&nbsp;&nbsp;'+nextWedStr + ' - '+nextWedOrd+'<hr/>T Shirt&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;&nbsp;&nbsp;&nbsp;<span class="highlight-text">'+nextWedTshirt+'</span></div><div class="col-4"><img class="card-img-top img-responsive" style="margin: 0 auto;" alt="'+nextWedTshirt+'" src="'+nextWedTshirtImg+'"></div>';
+      var htmlStr ='<div class="col-8 col-md-8 col-sm-8">Today: ' +today+'<hr/>Upcoming: <span class="highlight-text">'+nextWedStr + '</span><hr/>Wednesday Of The Month: <span class="highlight-text">' +nextWedOrd+'</span><hr/>T Shirt: <span class="highlight-text-cap">'+nextWedTshirt+'</span></div><div class="col-4 col-md-4 col-sm-4"><img class="card-img-top img-responsive" style="margin: 0 auto;" alt="'+nextWedTshirt+'" src="'+nextWedTshirtImg+'"></div>';
 
       $(".wednesdays-info-grid").empty();
       $(".wednesdays-info-grid").append(htmlStr);
@@ -229,7 +218,7 @@ function renderWednesdaysGridInfo(){
       htmlStr ='';
       for(var i=0; i<wednesdays.length; i++){
         if (i == nextWedIndex){
-          htmlStr = htmlStr + '<div class = "col-12"><div class="card"><div class="card-header">'+nextWedOrd+' - '+wednesdays[i].toLocaleDateString("en-IN", options)+'</div><img class="card-img-top" alt="'+nextWedTshirt+'" src="'+nextWedTshirtImg+'"><div class="card-body"><p class="card-text"><span class="highlight-text">'+nextWedTshirt+'</span></p></div></div></div><br/>';
+          htmlStr = htmlStr + '<div class = "col-12"><div class="card border-info"><div class="card-header text-info">'+nextWedOrd+' - '+wednesdays[i].toLocaleDateString("en-IN", options)+'</div><!--<img class="card-img-top" alt="'+nextWedTshirt+'" src="'+nextWedTshirtImg+'">--><div class="card-body text-info"><p class="card-text"><span class="highlight-text-cap3">'+nextWedTshirt+'</span></p></div></div></div><br/>';
         } else {
           htmlStr = htmlStr + '<div class = "col-12"><div class="card"><div class="card-header">'+ordinal_short[i]+' - '+wednesdays[i].toLocaleDateString("en-IN", options)+'</div><div class="card-body"><p class="card-text">'+tshirt[i]+' T Shirt</p></div></div></div><br/>';
         }
