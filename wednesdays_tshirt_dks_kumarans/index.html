@@ -155,7 +155,7 @@ var nextWedStr = nextWed.toLocaleDateString("en-IN", options)
 
 console.log('nextWedStr: ',nextWedStr);
 
-getWednesdaysOfMonth(nextWed.getMonth());
+var wednesdays = getWednesdaysOfMonth();
 
 console.log('wednesdays: ',wednesdays);
 
@@ -183,21 +183,23 @@ function getNextWednesday(){
   while (d.getDay() !== 3) {
       d.setDate(d.getDate() + 1);
   }
-  //console.log(new Date(d.getTime()));
+  console.log("Next Wednesday: ",new Date(d.getTime()));
   return d;
 }
 
-function getWednesdaysOfMonth(month = 0) {
-    var d = new Date();
-    if (month == 0){
-      month = d.getMonth();
-    }
+function getWednesdaysOfMonth() {
+    console.log('nextWed ',nextWed);
+    var d = new Date(nextWed);//new Date();
+    month = d.getMonth();
+    console.log('next wed month 0-11: ',month);
     d.setDate(1);
+    //console.log('d ',d);
     // Get the first Wednesday in the month
     while (d.getDay() !== 3) {
         d.setDate(d.getDate() + 1);
     }
     // Get all the other Wednesdays in the month
+    //wed = d;
     while (d.getMonth() === month) {
         wed = new Date(d.getTime());
         wednesdays.push(wed);
