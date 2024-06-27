@@ -27,7 +27,13 @@
 
     a, u {
        text-decoration: none;
-    }    
+    }
+
+    .disable-card {
+      background-color: rgba(245, 245, 245, 1);
+      opacity: .4;
+    }
+
     </style>
     <title>Wednesday T Shirt Info | Kumarans DKS</title>
 
@@ -89,17 +95,40 @@
       </div>
   </div>
   <br>
-  <div class="row">
+ 
+ <div class="row">
       <div class="col-12">
           <div class="card">
             <div class="card-header">
-              Dev Info:
+              Tips:
             </div>
             <div class="card-body">
               <div class="container">
                 <div class="row">
                   <div class="wednesdays-dev-info-grid">
-                    Feedback / Suggestions: <br/><br/><a href="https://wa.me/+919886138881?text=Hi, Regarding the Wednesday T shirt Portal"><i class="fa fa-whatsapp" aria-hidden="true"></i> Chandrashekar SK (Ansh - 2C) </a>    <br/><br/><a href="mailto:csk007@gmail.com?subject=Kumarans Wednesday Tshirt Info Portal&body=Hey Hi,"><i class="fa fa-envelope-o" aria-hidden="true"></i> csk007@gmail.com</a> 
+                    Please make sure your device time is correctly updated and is in sync with the world to display the correct information :)
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+      
+      </div>
+  </div>
+<br/>
+
+  <div class="row">
+      <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              Feedback / Suggestions:
+            </div>
+            <div class="card-body">
+              <div class="container">
+                <div class="row">
+                  <div class="wednesdays-dev-info-grid">
+                    <a href="https://wa.me/+919886138881?text=Hi, Regarding the Wednesday T shirt Portal"><i class="fa fa-whatsapp" aria-hidden="true"></i> Chandrashekar SK (Ansh - 2C) </a>    <br/><br/><a href="mailto:csk007@gmail.com?subject=Kumarans Wednesday Tshirt Info Portal&body=Hey Hi,"><i class="fa fa-envelope-o" aria-hidden="true"></i> csk007@gmail.com</a> 
                   </div>
                 </div>
               </div>
@@ -217,7 +246,12 @@ function getWednesdaysOfMonth() {
 function renderWednesdaysGridInfo(){
       //console.log("renderWednesdaysGridInfo: ",window.wednesdays);
       var today = new Date().toLocaleDateString("en-IN", options2);
-      var htmlStr ='<div class="col-8 col-md-8 col-sm-8">Today: <br/>' +today+'<hr/>Upcoming: <br/><span class="highlight-text">'+nextWedStr + '</span><hr/>Wednesday Of The Month: <br/><span class="highlight-text">' +nextWedOrd+'</span><hr/>T Shirt: <br/><span class="highlight-text-cap">'+nextWedTshirt+'</span></div><div class="col-4 col-md-4 col-sm-4"><br/><img class="img-fluid card-img-top img-responsiveDIS" style="margin: 0 auto;" alt="'+nextWedTshirt+'" src="'+nextWedTshirtImg+'"></div>';
+      var htmlStr ='<div class="col-8 col-md-8 col-sm-8">Today: <br/>' +today+
+      '<hr/>Upcoming Wednesday: <br/><span class="highlight-text">'+nextWedStr + 
+      '</span><hr/>Wednesday Of The Month: <br/><span class="highlight-text">' +nextWedOrd+
+      '</span><hr/>T Shirt: <br/><span class="highlight-text-cap">'+nextWedTshirt+
+      '</span></div><div class="col-4 col-md-4 col-sm-4"><br/><img class="img-fluid card-img-top img-responsiveDIS" style="margin: 0 auto;" alt="'+nextWedTshirt+
+      '" src="'+nextWedTshirtImg+'"></div>';
 
       $(".wednesdays-info-grid").empty();
       $(".wednesdays-info-grid").append(htmlStr);
@@ -227,7 +261,7 @@ function renderWednesdaysGridInfo(){
         if (i == nextWedIndex){
           htmlStr = htmlStr + '<div class = "col-12"><div class="card border-info"><div class="card-header text-info">'+nextWedOrd+' - '+wednesdays[i].toLocaleDateString("en-IN", options)+'</div><!--<img class="card-img-top" alt="'+nextWedTshirt+'" src="'+nextWedTshirtImg+'">--><div class="card-body text-info"><p class="card-text"><span class="highlight-text-cap3">'+nextWedTshirt+'</span></p></div></div></div><br/>';
         } else {
-          htmlStr = htmlStr + '<div class = "col-12"><div class="card"><div class="card-header">'+ordinal_short[i]+' - '+wednesdays[i].toLocaleDateString("en-IN", options)+'</div><div class="card-body"><p class="card-text">'+tshirt[i]+' T Shirt</p></div></div></div><br/>';
+          htmlStr = htmlStr + '<div class = "col-12"><div class="card disable-card"><div class="card-header">'+ordinal_short[i]+' - '+wednesdays[i].toLocaleDateString("en-IN", options)+'</div><div class="card-body"><p class="card-text">'+tshirt[i]+' T Shirt</p></div></div></div><br/>';
         }
       };
       $(".wednesdays-grid").empty();
