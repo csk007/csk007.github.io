@@ -17,11 +17,11 @@
     }
 
     .highlight-text{
-      color: blue;
+      color: rgb(20,162,184);
     }
 
     .highlight-text-cap{
-      color: blue;
+      color: rgb(20,162,184);
       text-transform: uppercase;
     }
 
@@ -176,9 +176,29 @@ var nextWedTshirtImg = '';
 var outText = "";
 var outTextShort = "";
 
+var today = new Date().toLocaleDateString("en-IN", options2);
+
 var nextWed = getNextWednesday();
 
 console.log('nextWed: ',nextWed);
+
+var daysLeft = datediff(new Date(today),new Date(nextWed));
+
+console.log('daysLeft: ', daysLeft);
+
+
+var daysLeftStr ='';
+
+if (daysLeft == 0){
+  daysLeftStr = 'Today';
+} else if (daysLeft == 1){
+    daysLeftStr = 'Tomorrow';
+} else if (daysLeft == 2){
+    daysLeftStr = 'Day After Tomorrow';
+} else {
+    daysLeftStr = daysLeft+' Days';
+}
+
 
 var nextWedStr = nextWed.toLocaleDateString("en-IN", options)
 
@@ -245,9 +265,8 @@ function getWednesdaysOfMonth() {
 
 function renderWednesdaysGridInfo(){
       //console.log("renderWednesdaysGridInfo: ",window.wednesdays);
-      var today = new Date().toLocaleDateString("en-IN", options2);
-      var htmlStr ='<div class="col-8 col-md-8 col-sm-8">Today: <br/>' +today+
-      '<hr/>Upcoming Wednesday: <br/><span class="highlight-text">'+nextWedStr + 
+      var htmlStr ='<div class="col-8 col-md-8 col-sm-8">Today: <br/><span class="highlight-text">' +today+
+      '</span><hr/>Upcoming Wed ('+daysLeftStr+'): <br/><span class="highlight-text">'+nextWedStr + 
       '</span><hr/>Wednesday Of The Month: <br/><span class="highlight-text">' +nextWedOrd+
       '</span><hr/>T Shirt: <br/><span class="highlight-text-cap">'+nextWedTshirt+
       '</span></div><div class="col-4 col-md-4 col-sm-4"><br/><img class="img-fluid card-img-top img-responsiveDIS" style="margin: 0 auto;" alt="'+nextWedTshirt+
@@ -266,6 +285,10 @@ function renderWednesdaysGridInfo(){
       };
       $(".wednesdays-grid").empty();
       $(".wednesdays-grid").append(htmlStr);
+}
+
+function datediff(first, second) {        
+    return Math.round((second - first) / (1000 * 60 * 60 * 24));
 }
     
 </script>
