@@ -233,7 +233,7 @@ renderWednesdaysGridInfo();
 
 
 function getNextWednesday(){
-  var d = new Date().toLocaleDateString("en-IN", options2);
+  var d = new Date();
   while (d.getDay() !== 3) {
       d.setDate(d.getDate() + 1);
   }
