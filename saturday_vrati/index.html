@@ -40,7 +40,7 @@
     }
 
     </style>
-    <title>Wednesday T Shirt Info | Kumarans DKS</title>
+    <title>CSK Vrati Info</title>
 
 </head>
 <body style="font-weight:600">
@@ -65,11 +65,11 @@
     <div class="col-12">
           <div class="card">
             <div class="card-header" >
-              Kumarans | DKS | T Shirt Info: <span id="refresh-timer" class="pull-right"></span>
+              CSK Next Vrati Info: <span id="refresh-timer" class="pull-right"></span>
             </div>
             <div class="card-body">
               <div class="container mx-0 px-0">
-                <div class="row wednesdays-info-grid">
+                <div class="row saturday-info-grid">
                   <!--<div class="wednesdays-info-grid"></div>-->
                 </div>
               </div>
@@ -85,12 +85,12 @@
       <div class="col-12">
           <div class="card">
             <div class="card-header">
-              Wednesdays Of The Month
+              Saturdays Of The Month
             </div>
             <div class="card-body">
               <div class="container">
                 <div class="row">
-                  <div class="wednesdays-grid"></div>
+                  <div class="saturdays-grid"></div>
                 </div>
               </div>
             </div>
@@ -160,84 +160,117 @@
     
     <script>
 
-const ordinal = ['First', 'Second', 'Third', 'Fourth', 'Fifth'];
-const ordinal_short = ['1st', '2nd', '3rd', '4th', '5th'];
-
 var options = {weekday: 'long',year: 'numeric', month: 'short', day: 'numeric' };
 var options2 = {weekday: 'long', month: 'long', day: 'numeric' };
 
 var saturdays = [];
 
+
+var todayStr = new Date().toLocaleDateString("en-IN", options2);
+
 var today = new Date();
 
-var todayStr = today.toLocaleDateString("en-IN", options2);
 
 
 // testing for all today scenarios 
 //today.setDate(today.getDate() + 120);
 
-if (today.getMonth() == 11) {
-    var nextMonth = new Date(today.getFullYear() + 1, 0, 1);
+var nextMonth = new Date(today.getFullYear() + 1, 0, 1);
+
+if (today.getMonth() === 11) {
+    nextMonth = new Date(today.getFullYear() + 1, 0, 1);
 } else {
-    var nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+    nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
 }
 
-var saturdays = getSaturdaysOfMonth(today);
 
-console.log('today: ',today);
-console.log('saturdays: ',saturdays);
-console.log('2nd Saturday: ',saturdays[1])
+console.log('today',today)
+saturdays = getSaturdaysOfMonth(today);
+
+console.log('saturdays this month: ',saturdays);
+console.log('2nd Saturday this month: ',saturdays[1])
 
 if (today <= saturdays[1]) {
-    console.log('vrati this month');
-    console.log('vrati: ',saturdays[1]);
+    console.log('VRATI is in this month');
+    console.log('===VRATI date this month: ',saturdays[1]);
 } else {
-    console.log('vrati next month');
+    console.log('VRATI is in next month');
     saturdays = getSaturdaysOfMonth(nextMonth);
-    console.log('vrati: ',saturdays[1]);
+    console.log('saturdays next month: ',saturdays);
+    console.log('2nd Saturday next month: ',saturdays[1])
+    console.log('===VRATI date next month: ',saturdays[1]);
 }
 
-var daysLeft = datediff(new Date(today),saturdays[1]);
+var daysLeft = datediff(today,saturdays[1]);
 
 console.log('daysLeft: ', daysLeft);
 
-var daysLeftStr ='';
+var finalStr ='';
 
-if (daysLeft == 0){
-  daysLeftStr = 'Today is your Vrati Day.';
-} else if (daysLeft == 1){
-    daysLeftStr = 'Tomorrow is your Vrati Day.';
-} else if (daysLeft == 2){
-    daysLeftStr = 'Day After Tomorrow is your Vrati Day.';
+if (daysLeft === 0){
+  finalStr = 'Today is the second saturday of the month, which is your Vrati Day.';
+} else if (daysLeft === 1){
+    finalStr = 'Tomorrow is the second saturday of the month, which is your Vrati Day.';
+} else if (daysLeft === 2){
+    finalStr = 'Day After Tomorrow is the second saturday of the month, which is your Vrati Day.';
 } else {
-    daysLeftStr = 'Your Next Vrati is on '+ saturdays[1].toLocaleDateString("en-IN", options2) +' which is in '+daysLeft+' Days';
+    finalStr = 'Your Next Vrati is on '+ saturdays[1].toLocaleDateString("en-IN", options2) +' it is the second saturday of the month, which is in '+daysLeft+' Days.';
 }
 
-console.log('daysLeftStr:',daysLeftStr);
+const repromptStr = ' You can say list 1, list 2, list 3  or full list , to know all the items to take along. or just say bye to cancel.';
+//finalStr = finalStr + repromptStr;
+
+console.log('finalStr:',finalStr);
 
 function getSaturdaysOfMonth(date) {
-    d= new Date(date); // very important to copy the date else its passed by refrence
-    var saturdays =[]
-    month = d.getMonth();
-    console.log('getSaturdaysOfMonth next sat month 0-11: ',month);
+    var saturdaysTemp = [];
+    var d = new Date(date);
+    var month = d.getMonth();
+    console.log('getSaturdaysOfMonth: next sat month 0-11: ',month);
     d.setDate(1);
-    console.log('getSaturdaysOfMonth date: ',d);
+    console.log('getSaturdaysOfMonth d: ',d);
+    console.log('getSaturdaysOfMonth month: ',month);
     // Get the first Saturday in the month
     while (d.getDay() !== 6) {
         d.setDate(d.getDate() + 1);
     }
+    console.log('getSaturdaysOfMonth 1st sat of month: ',d);
     // Get all the other Saturdays in the month
     while (d.getMonth() === month) {
-        sat = new Date(d.getTime());
-        saturdays.push(sat);
+        var sat = new Date(d.getTime());
+        saturdaysTemp.push(sat);
         d.setDate(d.getDate() + 7);
     }
-  return saturdays;
+  return saturdaysTemp;
 }
 
 function datediff(first, second) {        
     return Math.round((second - first) / (1000 * 60 * 60 * 24));
 }
+
+function renderSaturdaysGridInfo(){
+      //console.log("renderWednesdaysGridInfo: ",window.wednesdays);
+      var htmlStr ='<div class="col-8 col-md-8 col-sm-8">Today: <br/><span class="highlight-text">' +today+
+      '</span><hr/>Upcoming Vrati ('+daysLeft+' Days Left): <br/><span class="highlight-text">'+ saturdays[1].toLocaleDateString("en-IN", options2)+ 
+      '</span><hr/>Summary: <br/><span class="highlight-text">' +finalStr+
+      '</span></div>';
+
+      $(".saturday-info-grid").empty();
+      $(".saturday-info-grid").append(htmlStr);
+
+      htmlStr ='';
+      for(var i=0; i<saturdays.length; i++){
+        if (i == 1){
+          htmlStr = htmlStr + '<div class = "col-12"><div class="card border-info"><div class="card-header text-info">'+saturdays[i].toLocaleDateString("en-IN", options)+'</div></div></div><br/>';
+        } else {
+          htmlStr = htmlStr + '<div class = "col-12"><div class="card disable-card"><div class="card-header">'+saturdays[i].toLocaleDateString("en-IN", options)+'</div></div></div><br/>';
+        }
+      };
+      $(".saturdays-grid").empty();
+      $(".saturdays-grid").append(htmlStr);
+}
+
+  renderSaturdaysGridInfo();
     
 </script>
 
