@@ -4,6 +4,7 @@
  * @license MIT/GPL
  * https://github.com/westonruter/html5-audio-read-along
  */
+
 var ReadAlong = {
     text_element: null,
     audio_element: null,
@@ -297,11 +298,17 @@ var ReadAlong = {
         that.random_shlok_btn_element.addEventListener('click', function (e) {
             e.preventDefault();
             //e.stopPropagation();
-            console.log('hello');
-            var shloks = document.querySelectorAll('[data-shlok]');
-            var rnd = Math.floor(Math.random() * shloks.length);//get a random index from 0 to element length
-            shloks[rnd].click();
-            //console.log(shloks);
+            //console.log('hello');
+            //var shloks = document.querySelectorAll('[data-shlok]');
+            //var rnd = Math.floor(Math.random() * shloks.length);//get a random index from 0 to element length
+            //shloks[rnd].click();
+            //randomSequence[random_index];
+            console.log(random_index,randomSequence[random_index]);
+            random_index++;
+            if (random_index >= randomSequence.length){
+                random_index = 0;
+            }
+            document.querySelectorAll('[data-shlok="'+randomSequence[random_index]+'"]')[0].click();
         }, false);
 		
 		
