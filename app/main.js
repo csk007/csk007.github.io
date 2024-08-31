@@ -7,6 +7,7 @@ window.addEventListener('load', function (e) {
 			autopause_learn_mode_element: document.getElementById('autopause-learn-mode'),
 			learn_mode_btn_element: document.getElementById('learn-mode-btn'),
 			play_pause_btn_element: document.getElementById('play-pause-btn'),
+            random_shlok_btn_element: document.getElementById('random-shlok-btn'),
             autofocus_current_word: document.getElementById('autofocus-current-word').checked,
 			autopause_learn_mode: document.getElementById('autopause-learn-mode').checked
         };

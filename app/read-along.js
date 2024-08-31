@@ -1,4 +1,4 @@
-/**
+                                                                        /**
  * HTML5 Audio Read-Along
  * @author Weston Ruter, X-Team
  * @license MIT/GPL
@@ -10,6 +10,7 @@ var ReadAlong = {
 	autopause_learn_mode_element: null,
 	learn_mode_btn_element: null,
 	play_pause_btn_element: null,
+    random_shlok_btn_element: null,
     autofocus_current_word: true,
 	autopause_learn_mode: false,
     words: [],
@@ -291,6 +292,16 @@ var ReadAlong = {
             } else {
                     that.audio_element.pause();
             }
+        }, false);
+
+        that.random_shlok_btn_element.addEventListener('click', function (e) {
+            e.preventDefault();
+            //e.stopPropagation();
+            console.log('hello');
+            var shloks = document.querySelectorAll('[data-shlok]');
+            var rnd = Math.floor(Math.random() * shloks.length);//get a random index from 0 to element length
+            shloks[rnd].click();
+            //console.log(shloks);
         }, false);
 		
 		
