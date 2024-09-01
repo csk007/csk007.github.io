@@ -75,17 +75,17 @@ q {
 	margin-top: 14px;
 }
 
-.play-pause-float{
-	position:fixed;
-	width:60px;
-	height:60px;
-	bottom:40px;
-	right: 40px;
-	background-color:#0C9;
-	color:#FFF;
-	border-radius:50px;
-	text-align:center;
-	box-shadow: 2px 2px 3px #999;
+.adhyay-change-float{
+    position:fixed;
+    width:60px;
+    height:60px;
+    bottom:40px;
+    left: 40px;
+    background-color:#0C9;
+    color:#FFF;
+    border-radius:50px;
+    text-align:center;
+    box-shadow: 2px 2px 3px #999;
 }
 
 .learn-mode-float{
@@ -93,7 +93,7 @@ q {
 	width:60px;
 	height:60px;
 	bottom:40px;
-	left: 40px;
+	left: 120px;
 	background-color:#0C9;
 	color:#FFF;
 	border-radius:50px;
@@ -107,6 +107,19 @@ q {
     height:60px;
     bottom:40px;
     right: 120px;
+    background-color:#0C9;
+    color:#FFF;
+    border-radius:50px;
+    text-align:center;
+    box-shadow: 2px 2px 3px #999;
+}
+
+.play-pause-float{
+    position:fixed;
+    width:60px;
+    height:60px;
+    bottom:40px;
+    right: 40px;
     background-color:#0C9;
     color:#FFF;
     border-radius:50px;
