@@ -210,6 +210,7 @@ var ReadAlong = {
 	
 	learnModeEnable: function() {
 		var that = this;
+        that.setCookie('learn-mode','1',1);
 		that.learn_mode_btn_element.classList.remove('fa-eye');
 		that.learn_mode_btn_element.classList.add('fa-eye-slash');
 		var learnmode_word_els = this.text_element.querySelectorAll('span[data-learnmode]');
@@ -221,6 +222,7 @@ var ReadAlong = {
 
 	learnModeDisable: function() {
 		var that = this;
+        that.setCookie('learn-mode','0',1);        
 		that.learn_mode_btn_element.classList.remove('fa-eye-slash');
 		that.learn_mode_btn_element.classList.add('fa-eye');
 		var learnmode_word_els = this.text_element.querySelectorAll('span[data-learnmode]');
@@ -229,6 +231,32 @@ var ReadAlong = {
         });
 	
 	},
+
+    setCookie: function(name,value,days) {
+        var expires = "";
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime() + (days*24*60*60*1000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+    },
+
+    getCookie: function(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0;i < ca.length;i++) {
+            var c = ca[i];
+            while (c.charAt(0)==' ') c = c.substring(1,c.length);
+            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+        }
+        return null;
+    },
+
+    eraseCookie: function(name) {   
+        document.cookie = name +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    },
+
 
     addEventListeners: function () {
         var that = this;
