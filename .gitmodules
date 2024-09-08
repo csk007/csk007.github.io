@@ -1,0 +1,3 @@
+[submodule "ansh/ansh/spell-test"]
+	path = ansh/ansh/spell-test
+	url = https://github.com/deepurich/spelling-quiz.git
