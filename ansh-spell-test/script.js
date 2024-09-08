@@ -11,10 +11,9 @@ let count = 0;
 let countdown;
 
 let quizArray = [];
-let correctWords = ["pleasant", "suddenly", "harsh", "children", "attacked", "because", "feather", "disappeared", "tickle", "happily", "important", "mischief", "finish", "treasure", "library", "through", "together", "turnip", "surprise", "trotted", "carefully", "hopped", "wonder", "cabbage", "returned", "trudged", "exclaimed", "pawed", "greedy", "magic", "lanes", "finishes", "scared", "swimming", "giraffe", "please", "squaked", "moment", "barked", "straight"];
+let correctWords = ["pleasant", "suddenly", "harsh", "children", "attacked", "because", "feather", "disappeared", "tickle", "happily", "important", "mischief", "finish", "treasure", "library", "through", "together", "turnip", "surprise", "trotted", "carefully", "hopped", "wonder", "cabbage", "returned", "trudged", "exclaimed", "pawed", "greedy", "magic", "lanes", "finishes", "scared", "swimming", "giraffe", "please", "squawked", "moment", "barked", "straight"];
 
-let incorrectWords = ["pleasent", "suddanly", "harssh", "childdren", "atacked", "becuase", "feather", "disapeared", "tickel", "hapily", "importent", "misschief", "fenish", "treazure", "libbrary", "throu", "toogether", "turneep", "suprise", "troted", "carefuly", "hoped", "wondar", "cabage", "retarned", "truged", "exclamed", "pawd", "gredy", "magik", "lans", "finishess", "scarred", "swiming", "girafe", "pleasee", "skuaked", "momant", "barkked", "stright"];
-
+let incorrectWords = ["pleasent", "suddanly", "harssh", "childdren", "atacked", "becuase", "feather", "disapeared", "tickel", "hapily", "importent", "misschief", "fenish", "treazure", "libbrary", "throu", "toogether", "turneep", "suprise", "troted", "carefuly", "hoped", "wondar", "cabage", "retarned", "truged", "exclamed", "pawd", "gredy", "magik", "lans", "finishess", "scarred", "swiming", "girafe", "pleasee", "skuawked", "momant", "barkked", "stright"];
 
 //Random value from array
 const generateRandomValue = (array) =>
