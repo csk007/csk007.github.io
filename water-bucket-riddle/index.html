@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Water Bucket Riddle - Pro</title>
+    <style>
+        :root {
+            --water-color: #007bff; /* Bright Blue */
+            --csk-yellow: #ffcb05;    /* CSK Yellow */
+            --bucket-border: #333;
+            --bg-color: #fafafa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            margin: 0;
+            color: #333;
+            overflow-x: hidden; 
+        }
+
+        h2 { 
+            color: #111; 
+            margin: 15px 0; 
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 3px solid var(--csk-yellow);
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+
+        /* --- Controls & Config --- */
+        .controls-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 600px;
+            box-sizing: border-box;
+            position: relative;
+            z-index: 50; 
+        }
+
+        .config-icon {
+            position: absolute; top: 10px; right: 15px; font-size: 24px;
+            cursor: pointer; color: #555; transition: transform 0.3s; user-select: none;
+        }
+        .config-icon:hover { transform: rotate(90deg); color: #000; }
+
+        .config-panel {
+            display: none; background: #f9f9f9; border: 1px solid #ddd;
+            padding: 15px; margin-bottom: 15px; border-radius: 8px; text-align: center;
+        }
+        .config-panel.active { display: block; animation: fadeIn 0.3s; }
+        
+        .save-btn {
+            background-color: #28a745; color: white; border: none;
+            padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; margin-top: 10px;
+        }
+
+        .input-row {
+            display: flex; flex-wrap: wrap; gap: 15px; justify-content: center;
+            align-items: flex-end; margin-bottom: 15px; margin-top: 15px; 
+        }
+
+        .input-group { display: flex; flex-direction: column; flex: 1; min-width: 80px; }
+        label { font-size: 13px; font-weight: 700; margin-bottom: 5px; color: #555; }
+        input { padding: 10px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px; text-align: center; width: 100%; box-sizing: border-box; font-weight: bold; }
+
+        .main-btn {
+            background-color: var(--csk-yellow); color: #111; border: 2px solid #e0b100;
+            padding: 10px 20px; font-size: 16px; font-weight: 800; border-radius: 6px;
+            cursor: pointer; min-width: 120px; transition: all 0.2s; flex-basis: 100%; 
+        }
+        .main-btn:hover { background-color: #ffd700; transform: translateY(-1px); }
+        @media (min-width: 550px) { .main-btn { flex-basis: auto; } }
+
+        .playback-controls { display: flex; justify-content: center; gap: 15px; border-top: 1px solid #eee; padding-top: 15px; }
+        .ctrl-btn { background-color: #34495e; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 600; min-width: 80px; }
+        .ctrl-btn:disabled { background-color: #bdc3c7; cursor: not-allowed; opacity: 0.7; }
+
+        /* --- ANIMATION ARENA --- */
+        .arena {
+            display: flex;
+            justify-content: center;
+            gap: 60px; 
+            align-items: flex-end;
+            height: 320px; 
+            width: 100%;
+            max-width: 500px;
+            padding: 10px;
+            box-sizing: border-box;
+            margin-top: 50px; 
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .bucket-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            transform-origin: bottom center;
+            transition: transform 0.5s ease; 
+            width: 100px; 
+        }
+
+        .bucket {
+            position: relative;
+            width: 100%;
+            height: 100%; 
+            border: 5px solid var(--bucket-border);
+            border-top: none;
+            border-radius: 0 0 15px 15px;
+            background: rgba(255,255,255,0.95);
+            overflow: hidden;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.1);
+            z-index: 2;
+        }
+
+        .water {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 0%;
+            background-color: var(--water-color);
+            transition: height 1s linear; 
+            opacity: 0.9;
+        }
+        .no-anim .water { transition: height 0.3s ease-out; }
+
+        .bucket-label { margin-top: 8px; font-weight: bold; font-size: 18px; }
+        .bucket-name { font-size: 13px; color: #555; margin-bottom: 2px; text-transform: uppercase; font-weight: bold; }
+        .bucket-cap-display { font-size: 11px; color: #888; margin-bottom: 5px; }
+
+        /* --- STREAMS & ANIMATIONS --- */
+
+        .tap-stream {
+            position: absolute; top: -300px; left: 50%; transform: translateX(-50%);
+            width: 15px; height: 300px; background-color: var(--water-color);
+            z-index: 1; display: none; border-radius: 0 0 10px 10px;
+        }
+        .filling .tap-stream { display: block; animation: flowDown 0.3s forwards; }
+
+        .empty-stream {
+            position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+            width: 20px; height: 0; background-color: var(--water-color);
+            z-index: 0; opacity: 0; transition: opacity 0.2s;
+        }
+        .emptying .empty-stream { height: 200px; opacity: 1; transition: height 0.3s ease-out; }
+
+        .tilt-right { transform: rotate(45deg); }
+        .tilt-left  { transform: rotate(-45deg); }
+        .tilt-dump  { transform: rotate(135deg); } 
+
+        .stream-r {
+            position: absolute; top: 0; right: -10px; width: 0; height: 0;
+            border-left: 10px solid transparent; border-right: 10px solid transparent;
+            border-top: 150px solid var(--water-color); transform: rotate(-45deg); 
+            opacity: 0; transition: opacity 0.2s; pointer-events: none;
+        }
+        .stream-l {
+            position: absolute; top: 0; left: -10px; width: 0; height: 0;
+            border-left: 10px solid transparent; border-right: 10px solid transparent;
+            border-top: 150px solid var(--water-color); transform: rotate(45deg);
+            opacity: 0; transition: opacity 0.2s; pointer-events: none;
+        }
+        .pouring-r .stream-r { opacity: 1; }
+        .pouring-l .stream-l { opacity: 1; }
+
+        #errorArea { color: #d32f2f; font-weight: bold; margin: 10px 0; text-align: center; background-color: #ffebee; padding: 8px; border-radius: 4px; display: none; }
+        #successArea { color: #155724; background-color: #d4edda; border-color: #c3e6cb; font-weight: bold; margin: 10px 0; text-align: center; padding: 10px; border-radius: 4px; display: none; }
+        
+        /* Math Box */
+        #equationBox {
+            background-color: #e8f4fd; border-left: 5px solid #007bff; padding: 15px; margin-top: 15px;
+            border-radius: 4px; font-family: 'Courier New', Courier, monospace; color: #333; display: none; width: 100%; box-sizing: border-box; text-align: left;
+        }
+        .eq-title { font-weight: bold; display: block; margin-bottom: 8px; font-family: sans-serif; color: #007bff; }
+        .eq-text { font-size: 18px; font-weight: bold; }
+        .eq-ref { font-size: 13px; font-weight: bold; color: #555; margin-bottom: 8px; font-style: italic; font-family: sans-serif; }
+        .eq-sub { font-size: 16px; margin-top: 8px; color: #d35400; font-weight: bold; font-family: sans-serif; }
+        .eq-note { font-size: 12px; margin-top: 5px; color: #666; font-family: sans-serif; }
+
+        .table-container { width: 100%; max-width: 600px; max-height: 250px; overflow-y: auto; margin-bottom: 30px; background: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid #eee; }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th { background-color: #333; color: var(--csk-yellow); position: sticky; top: 0; z-index: 10; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        tr.active-step { background-color: #fff9c4; font-weight: bold; border-left: 6px solid var(--csk-yellow); }
+
+        @keyframes flowDown { from { height: 0; } to { height: 300px; } }
+
+    </style>
+</head>
+<body>
+
+    <h2>Water Bucket Riddle</h2>
+
+    <div class="controls-container">
+        <div class="config-icon" onclick="toggleConfig()" title="Settings">⚙️</div>
+        <div id="configPanel" class="config-panel">
+            <div style="font-size:16px; font-weight:bold; color:#333; margin-bottom:10px;">Settings</div>
+            
+            <div style="margin-bottom:10px;">
+                <span style="font-size:14px; font-weight:bold;">Max Size:</span>
+                <input type="number" id="sysMaxLimit" value="100" style="width:60px; padding:4px;">
+            </div>
+
+            <div style="margin-bottom:10px;">
+                <span style="font-size:14px; font-weight:bold;">Method:</span>
+                <select id="sysMethod" style="padding:4px;">
+                    <option value="fastest">Fastest (Auto)</option>
+                    <option value="smallFirst">Small First</option>
+                    <option value="largeFirst">Large First</option>
+                </select>
+            </div>
+
+            <div style="margin-bottom:10px;">
+                <span style="font-size:14px; font-weight:bold;">Animation:</span>
+                <select id="sysAnim" style="padding:4px;">
+                    <option value="on">On</option>
+                    <option value="off">Off</option>
+                </select>
+            </div>
+
+            <button class="save-btn" onclick="saveConfig()">Save</button>
+        </div>
+
+        <div id="errorArea"></div>
+        <div id="successArea"></div>
+        <div id="equationBox"></div>
+
+        <div class="input-row">
+            <div class="input-group">
+                <label>Bucket 1 (X)</label>
+                <input type="number" id="cap1" value="3" min="1" max="100" placeholder="Max 100">
+            </div>
+            <div class="input-group">
+                <label>Bucket 2 (Y)</label>
+                <input type="number" id="cap2" value="5" min="1" max="100" placeholder="Max 100">
+            </div>
+            <div class="input-group">
+                <label>Target (Z)</label>
+                <input type="number" id="target" value="4" min="1" max="100" placeholder="Max 100">
+            </div>
+            <button class="main-btn" onclick="solveProblem()" id="solveBtn">SOLVE</button>
+        </div>
+
+        <div class="playback-controls">
+            <button class="ctrl-btn" id="btnPrev" onclick="stepBackward()" disabled>&#9664; Prev</button>
+            <button class="ctrl-btn" id="btnPlay" onclick="togglePlay()" disabled>Pause</button>
+            <button class="ctrl-btn" id="btnNext" onclick="stepForward()" disabled>Next &#9654;</button>
+        </div>
+    </div>
+
+    <div class="arena">
+        
+        <div class="bucket-wrapper" id="wrap1">
+            <div class="tap-stream"></div> 
+            <div class="bucket-name">Bucket 1 (X)</div>
+            <div class="bucket-cap-display">Cap: <span id="dispCap1">3</span>L</div>
+            
+            <div class="bucket" id="b1-container" style="height: 150px;">
+                <div class="water" id="w1"></div>
+                <div class="stream-r"></div> 
+                <div class="empty-stream"></div>
+            </div>
+            <div class="bucket-label" id="l1">0L</div>
+        </div>
+
+        <div class="bucket-wrapper" id="wrap2">
+            <div class="tap-stream"></div>
+            <div class="bucket-name">Bucket 2 (Y)</div>
+            <div class="bucket-cap-display">Cap: <span id="dispCap2">5</span>L</div>
+            
+            <div class="bucket" id="b2-container" style="height: 250px;">
+                <div class="water" id="w2"></div>
+                <div class="stream-l"></div>
+                <div class="empty-stream"></div>
+            </div>
+            <div class="bucket-label" id="l2">0L</div>
+        </div>
+
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr><th style="width:40px">#</th><th>Action</th><th>B1</th><th>B2</th></tr>
+            </thead>
+            <tbody id="stepsBody">
+                <tr><td colspan="4" style="text-align:center; color:#999; padding:20px">Enter values and click Solve</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+<script>
+    // --- 1. Global Settings ---
+    let MAX_LIMIT = 100; 
+    let SOLVE_METHOD = 'fastest'; 
+    let ANIMATION_ENABLED = false;
+
+    let C1, C2, T;
+    let allSteps = [];
+    let currentStep = 0;
+    let isPlaying = false;
+    let playTimer = null;
+    let usedDirection = '';
+
+    const wrap1 = document.getElementById('wrap1');
+    const wrap2 = document.getElementById('wrap2');
+    const w1 = document.getElementById('w1');
+    const w2 = document.getElementById('w2');
+
+    // --- 2. Config ---
+    function toggleConfig() {
+        const panel = document.getElementById('configPanel');
+        panel.classList.toggle('active');
+    }
+    function saveConfig() {
+        MAX_LIMIT = parseInt(document.getElementById('sysMaxLimit').value) || 100;
+        SOLVE_METHOD = document.getElementById('sysMethod').value;
+        ANIMATION_ENABLED = (document.getElementById('sysAnim').value === 'on');
+
+        ['cap1', 'cap2', 'target'].forEach(id => {
+            document.getElementById(id).setAttribute('max', MAX_LIMIT);
+            document.getElementById(id).placeholder = `Max ${MAX_LIMIT}`;
+        });
+        document.getElementById('configPanel').classList.remove('active');
+        document.getElementById('successArea').innerText = "Settings Saved!";
+        document.getElementById('successArea').style.display = 'block';
+
+        if(!ANIMATION_ENABLED) {
+            document.body.classList.add('no-anim');
+        } else {
+            document.body.classList.remove('no-anim');
+        }
+    }
+
+    // --- 3. Solver ---
+    const gcd = (a, b) => (!b ? a : gcd(b, a % b));
+
+    function solveProblem() {
+        try {
+            resetAnimationState(); 
+            pauseSimulation(); 
+            
+            document.getElementById('errorArea').style.display='none';
+            document.getElementById('successArea').style.display='none';
+            document.getElementById('equationBox').style.display='none';
+
+            C1 = parseInt(document.getElementById('cap1').value);
+            C2 = parseInt(document.getElementById('cap2').value);
+            T = parseInt(document.getElementById('target').value);
+
+            if (isNaN(C1) || isNaN(C2) || isNaN(T) || C1<=0 || C2<=0 || T<=0) throw new Error("Enter positive integers.");
+            if (C1>MAX_LIMIT || C2>MAX_LIMIT || T>MAX_LIMIT) throw new Error(`Values > Max Limit (${MAX_LIMIT}).`);
+            if (T > Math.max(C1, C2)) throw new Error("Target > Largest Bucket.");
+            if (T % gcd(C1, C2) !== 0) throw new Error("Target must be multiple of GCD.");
+
+            const maxCap = Math.max(C1, C2);
+            document.getElementById('b1-container').style.height = `${(C1/maxCap)*250}px`;
+            document.getElementById('b2-container').style.height = `${(C2/maxCap)*250}px`;
+            document.getElementById('dispCap1').innerText = C1;
+            document.getElementById('dispCap2').innerText = C2;
+
+            const p1 = simulate(C1, C2, T, false);
+            const p2 = simulate(C2, C1, T, true);
+            
+            let finalPath = [];
+            if (SOLVE_METHOD === 'fastest') {
+                finalPath = (p1.length <= p2.length) ? p1 : p2;
+                usedDirection = (p1.length <= p2.length) ? 'b1_fill' : 'b2_fill';
+            } else if (SOLVE_METHOD === 'smallFirst') {
+                finalPath = (C1 < C2) ? p1 : p2;
+                usedDirection = (C1 < C2) ? 'b1_fill' : 'b2_fill';
+            } else { 
+                finalPath = (C1 > C2) ? p1 : p2;
+                usedDirection = (C1 > C2) ? 'b1_fill' : 'b2_fill';
+            }
+
+            allSteps = finalPath;
+            generateEquation(allSteps, usedDirection);
+
+            currentStep = 0;
+            renderTable();
+            updateVisuals(0); 
+
+            document.getElementById('btnPrev').disabled = true;
+            document.getElementById('btnNext').disabled = false;
+            document.getElementById('btnPlay').disabled = false;
+            
+            //togglePlay();
+
+        } catch(e) {
+            const err = document.getElementById('errorArea');
+            err.innerText = e.message;
+            err.style.display = 'block';
+        }
+    }
+
+    function simulate(cFrom, cTo, target, swap) {
+        let from=0, to=0, steps = [{v1:0, v2:0, action:"Start", type:"start"}];
+        from = cFrom;
+        steps.push(rec(from, to, swap, "fill", swap?2:1));
+
+        let safety=0;
+        while(from!==target && to!==target && safety<200) {
+            safety++;
+            let amt = Math.min(from, cTo-to);
+            from -= amt; to += amt;
+            steps.push(rec(from, to, swap, "pour", swap?2:1)); 
+
+            if(from===target || to===target) break;
+
+            if(to===cTo) {
+                to=0;
+                steps.push(rec(from, to, swap, "empty", swap?1:2)); 
+            }
+            if(from===0) {
+                from=cFrom;
+                steps.push(rec(from, to, swap, "fill", swap?2:1));
+            }
+        }
+        return steps;
+    }
+
+    function rec(f, t, swap, type, actor) {
+        return {
+            v1: swap ? t : f,
+            v2: swap ? f : t,
+            action: getActionText(type, actor, swap),
+            type: type,
+            actor: actor 
+        };
+    }
+
+    function getActionText(type, actor, swap) {
+        if(type==='fill') return `Fill Bucket ${actor}`;
+        if(type==='empty') return `Empty Bucket ${actor}`;
+        if(type==='pour') return `Pour B${actor} -> B${actor===1?2:1}`;
+        return "Start";
+    }
+
+    // --- 4. Animation Logic ---
+
+    function resetAnimationState() {
+        wrap1.className = 'bucket-wrapper';
+        wrap2.className = 'bucket-wrapper';
+    }
+
+    function performStepAnimation(stepIndex) {
+        if(stepIndex < 0 || stepIndex >= allSteps.length) return;
+        
+        const step = allSteps[stepIndex];
+        const type = step.type;
+        const actor = step.actor;
+
+        resetAnimationState();
+
+        if (!ANIMATION_ENABLED) {
+             updateVisuals(stepIndex);
+             return;
+        }
+
+        if (type === 'fill') {
+            const w = actor === 1 ? wrap1 : wrap2;
+            w.classList.add('filling');
+        } 
+        else if (type === 'empty') {
+            const w = actor === 1 ? wrap1 : wrap2;
+            w.classList.add('emptying');
+            w.classList.add('tilt-dump'); 
+        } 
+        else if (type === 'pour') {
+            if(actor === 1) {
+                wrap1.classList.add('pouring-r'); 
+                wrap1.classList.add('tilt-right'); 
+            } else {
+                wrap2.classList.add('pouring-l');
+                wrap2.classList.add('tilt-left');
+            }
+        }
+
+        setTimeout(() => {
+            updateVisuals(stepIndex);
+        }, 100);
+
+        setTimeout(() => {
+            resetAnimationState();
+        }, 1200);
+    }
+
+    function updateVisuals(index) {
+        const s = allSteps[index];
+        const p1 = (s.v1 / C1) * 100;
+        const p2 = (s.v2 / C2) * 100;
+        w1.style.height = `${p1}%`;
+        w2.style.height = `${p2}%`;
+        document.getElementById('l1').innerText = `${s.v1}L`;
+        document.getElementById('l2').innerText = `${s.v2}L`;
+
+        const rows = document.querySelectorAll('#stepsBody tr');
+        rows.forEach(r => r.classList.remove('active-step'));
+        if(rows[index]) {
+            rows[index].classList.add('active-step');
+            rows[index].scrollIntoView({behavior: "smooth", block: "nearest"});
+        }
+        
+        document.getElementById('btnPrev').disabled = (index === 0);
+        document.getElementById('btnNext').disabled = (index === allSteps.length - 1);
+    }
+
+    // --- 5. Controls ---
+    function pauseSimulation() {
+        isPlaying = false;
+        clearTimeout(playTimer);
+        document.getElementById('btnPlay').innerText = "Play";
+    }
+
+    function togglePlay() {
+        if(isPlaying) {
+            pauseSimulation();
+        } else {
+            if(currentStep >= allSteps.length - 1) currentStep = -1;
+            isPlaying = true;
+            document.getElementById('btnPlay').innerText = "Pause";
+            playLoop();
+        }
+    }
+
+    function playLoop() {
+        if(!isPlaying) return;
+        if(currentStep < allSteps.length - 1) {
+            currentStep++;
+            performStepAnimation(currentStep);
+            
+            const delay = ANIMATION_ENABLED ? 2000 : 2000; 
+            playTimer = setTimeout(playLoop, delay); 
+        } else {
+            pauseSimulation();
+        }
+    }
+
+    function stepForward() {
+        pauseSimulation();
+        if(currentStep < allSteps.length - 1) {
+            currentStep++;
+            performStepAnimation(currentStep);
+        }
+    }
+    
+    // FIXED: Added resetAnimationState() here
+    function stepBackward() {
+        pauseSimulation();
+        resetAnimationState(); // Crucial fix for visual bugs when going back
+        if(currentStep > 0) {
+            currentStep--;
+            updateVisuals(currentStep); 
+        }
+    }
+
+    // --- 6. Equation Gen ---
+    function generateEquation(steps, dir) {
+        let a=0, b=0;
+        if(dir === 'b1_fill') {
+            steps.forEach(s => {
+                if(s.type==='fill' && s.actor===1) a++;
+                if(s.type==='empty' && s.actor===2) b++;
+                if(s===steps[steps.length-1] && s.v2===C2) b++;
+            });
+            showEq(T, a, C1, "X", b, C2, "Y");
+        } else {
+            steps.forEach(s => {
+                if(s.type==='fill' && s.actor===2) a++;
+                if(s.type==='empty' && s.actor===1) b++;
+                if(s===steps[steps.length-1] && s.v1===C1) b++;
+            });
+            showEq(T, a, C2, "Y", b, C1, "X");
+        }
+    }
+
+    function showEq(Z, a, vS, nS, b, vD, nD) {
+        const box = document.getElementById('equationBox');
+        box.style.display = 'block';
+        
+        const actualSteps = allSteps.length - 1; 
+
+        box.innerHTML = `<span class="eq-title">Math Solution:</span>
+        <div class="eq-ref">(Linear Diophantine Equation)</div>
+        <div class="eq-text">${Z} = (${a} × ${vS}) - (${b} × ${vD})</div>
+        <div class="eq-sub">
+            Total Steps: ${actualSteps}
+        </div>
+        <div class="eq-note">
+            (a = Times Filled ${nS}, b = Times Emptied ${nD})
+        </div>`;
+    }
+    function renderTable() {
+        const tbody = document.getElementById('stepsBody');
+        tbody.innerHTML = "";
+        allSteps.forEach((s, i) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td>${i}</td><td>${s.action}</td><td>${s.v1}L</td><td>${s.v2}L</td>`;
+            tbody.appendChild(tr);
+        });
+    }
+
+</script>
+</body>
+</html>
