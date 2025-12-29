@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bomb Chip Challenge</title>
+    <style>
+        :root {
+            --bg-color: #2c3e50;
+            --chip-color: #ecf0f1;
+            --accent-color: #3498db;
+            --bomb-color: #e74c3c;
+            --safe-color: #27ae60;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+
+        h1 { margin-bottom: 10px; }
+        
+        #status {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            min-height: 50px;
+            color: #f1c40f;
+        }
+
+        /* The Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .chip {
+            background-color: var(--chip-color);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            transition: transform 0.1s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            user-select: none;
+        }
+
+        .chip:active { transform: scale(0.95); }
+
+        /* Chip States */
+        .chip.selected {
+            border: 5px solid var(--accent-color);
+        }
+
+        .chip.safe {
+            background-color: var(--safe-color);
+            animation: popIn 0.3s;
+        }
+
+        .chip.exploded {
+            background-color: var(--bomb-color);
+            animation: shake 0.5s;
+        }
+
+        /* UI Buttons */
+        button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            display: none; /* Hidden by default */
+        }
+
+        button:hover { background-color: #2980b9; }
+
+        /* Animations */
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+
+        /* Overlay for passing device */
+        #overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>💣 Bomb Chip Challenge</h1>
+    <div id="status">Welcome! Player 1, get ready to hide your bombs.</div>
+
+    <div class="grid" id="gameGrid">
+        </div>
+
+    <button id="actionBtn" onclick="handleAction()">Confirm Hiding Spots</button>
+
+    <div id="overlay">
+        <h2 id="overlayText">Pass Device to Player 2</h2>
+        <button id="overlayBtn" style="display:block" onclick="dismissOverlay()">Ready</button>
+    </div>
+
+    <script>
+        // --- Audio Context for Blast Sound ---
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioContext();
+
+        function playBlastSound() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(100, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+
+            gainNode.gain.setValueAtTime(1, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.5);
+        }
+
+        function playSafeSound() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.1);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.1);
+        }
+
+        // --- Game Logic ---
+        const grid = document.getElementById('gameGrid');
+        const statusEl = document.getElementById('status');
+        const actionBtn = document.getElementById('actionBtn');
+        const overlay = document.getElementById('overlay');
+        const overlayText = document.getElementById('overlayText');
+
+        let gameState = 'SETUP_P1'; // SETUP_P1, SETUP_P2, PLAY_P1, PLAY_P2, GAME_OVER
+        let p1HiddenBombs = []; // Array of indices (0-8)
+        let p2HiddenBombs = [];
+        let p1BombsTriggered = 0; // How many bombs P1 has stepped on
+        let p2BombsTriggered = 0; // How many bombs P2 has stepped on
+        
+        // Tracking revealed tiles (0 = unknown, 1 = safe, 2 = exploded)
+        let p1ViewOfP2Board = Array(9).fill(0); 
+        let p2ViewOfP1Board = Array(9).fill(0);
+
+        function initGrid() {
+            grid.innerHTML = '';
+            for (let i = 0; i < 9; i++) {
+                let chip = document.createElement('div');
+                chip.classList.add('chip');
+                chip.dataset.index = i;
+                chip.onclick = () => handleChipClick(i);
+                grid.appendChild(chip);
+            }
+        }
+
+        function handleChipClick(index) {
+            if (gameState === 'GAME_OVER') return;
+
+            const chips = document.querySelectorAll('.chip');
+
+            // --- SETUP PHASE ---
+            if (gameState === 'SETUP_P1' || gameState === 'SETUP_P2') {
+                let currentArray = (gameState === 'SETUP_P1') ? p1HiddenBombs : p2HiddenBombs;
+                
+                // Toggle selection
+                if (currentArray.includes(index)) {
+                    currentArray = currentArray.filter(i => i !== index);
+                    chips[index].classList.remove('selected');
+                    chips[index].innerHTML = "";
+                } else {
+                    if (currentArray.length < 3) {
+                        currentArray.push(index);
+                        chips[index].classList.add('selected');
+                        chips[index].innerHTML = "💣";
+                    }
+                }
+
+                // Update the global variable
+                if (gameState === 'SETUP_P1') p1HiddenBombs = currentArray;
+                else p2HiddenBombs = currentArray;
+
+                // Update UI Text
+                let count = currentArray.length;
+                statusEl.innerText = `Hiding Bombs: ${count}/3 placed.`;
+                
+                if (count === 3) {
+                    actionBtn.style.display = 'inline-block';
+                } else {
+                    actionBtn.style.display = 'none';
+                }
+            }
+
+            // --- PLAY PHASE ---
+            else if (gameState === 'PLAY_P1' || gameState === 'PLAY_P2') {
+                let opponentBombs = (gameState === 'PLAY_P1') ? p2HiddenBombs : p1HiddenBombs;
+                let currentView = (gameState === 'PLAY_P1') ? p1ViewOfP2Board : p2ViewOfP1Board;
+
+                // Prevent clicking already revealed tiles
+                if (currentView[index] !== 0) return;
+
+                if (opponentBombs.includes(index)) {
+                    // HIT BOMB!
+                    playBlastSound();
+                    chips[index].classList.add('exploded');
+                    chips[index].innerHTML = "💥";
+                    currentView[index] = 2; // Mark as exploded
+
+                    if (gameState === 'PLAY_P1') {
+                        p1BombsTriggered++;
+                        statusEl.innerText = `P1 stepped on a BOMB! (${p1BombsTriggered}/3)`;
+                    } else {
+                        p2BombsTriggered++;
+                        statusEl.innerText = `P2 stepped on a BOMB! (${p2BombsTriggered}/3)`;
+                    }
+
+                    checkWinCondition();
+                    
+                    // Don't switch turns immediately on bomb? Usually in these games 
+                    // you lose turn. Let's force a turn switch after a delay.
+                    setTimeout(switchTurn, 1500);
+
+                } else {
+                    // SAFE
+                    playSafeSound();
+                    chips[index].classList.add('safe');
+                    currentView[index] = 1; // Mark as safe
+                    statusEl.innerText = "Safe! Switching turns...";
+                    setTimeout(switchTurn, 1000);
+                }
+            }
+        }
+
+        function handleAction() {
+            if (gameState === 'SETUP_P1') {
+                showOverlay("Pass device to Player 2", () => {
+                    gameState = 'SETUP_P2';
+                    resetGridVisuals();
+                    statusEl.innerText = "Player 2: Hide your 3 bombs.";
+                    actionBtn.style.display = 'none';
+                });
+            } else if (gameState === 'SETUP_P2') {
+                showOverlay("Setup Complete! Pass to Player 1 to start.", () => {
+                    gameState = 'PLAY_P1';
+                    resetGridVisuals();
+                    statusEl.innerText = "Player 1's Turn: Tap a chip to find bombs.";
+                    actionBtn.style.display = 'none';
+                });
+            }
+        }
+
+        function switchTurn() {
+            if (gameState === 'GAME_OVER') return;
+
+            if (gameState === 'PLAY_P1') {
+                showOverlay("Pass device to Player 2", () => {
+                    gameState = 'PLAY_P2';
+                    renderBoardState(p2ViewOfP1Board);
+                    statusEl.innerText = `Player 2's Turn (Bombs hit: ${p2BombsTriggered}/3)`;
+                });
+            } else {
+                showOverlay("Pass device to Player 1", () => {
+                    gameState = 'PLAY_P1';
+                    renderBoardState(p1ViewOfP2Board);
+                    statusEl.innerText = `Player 1's Turn (Bombs hit: ${p1BombsTriggered}/3)`;
+                });
+            }
+        }
+
+        function renderBoardState(viewArray) {
+            const chips = document.querySelectorAll('.chip');
+            chips.forEach((chip, i) => {
+                chip.className = 'chip'; // Reset classes
+                chip.innerHTML = '';
+                if (viewArray[i] === 1) {
+                    chip.classList.add('safe');
+                } else if (viewArray[i] === 2) {
+                    chip.classList.add('exploded');
+                    chip.innerHTML = "💥";
+                }
+            });
+        }
+
+        function resetGridVisuals() {
+            const chips = document.querySelectorAll('.chip');
+            chips.forEach(chip => {
+                chip.className = 'chip';
+                chip.innerHTML = '';
+            });
+        }
+
+        function checkWinCondition() {
+            if (p1BombsTriggered === 3) {
+                endGame("Player 1 tapped 3 bombs. Player 2 WINS!");
+            } else if (p2BombsTriggered === 3) {
+                endGame("Player 2 tapped 3 bombs. Player 1 WINS!");
+            }
+        }
+
+        function endGame(msg) {
+            gameState = 'GAME_OVER';
+            statusEl.innerText = msg;
+            statusEl.style.color = '#e74c3c';
+            statusEl.style.fontWeight = 'bold';
+        }
+
+        function showOverlay(text, callback) {
+            overlayText.innerText = text;
+            overlay.style.display = 'flex';
+            document.getElementById('overlayBtn').onclick = () => {
+                overlay.style.display = 'none';
+                if (callback) callback();
+            };
+        }
+
+        function dismissOverlay() {
+            overlay.style.display = 'none';
+        }
+
+        // Start
+        initGrid();
+
+    </script>
+</body>
+</html>
