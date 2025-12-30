@@ -11,6 +11,7 @@
             --accent-color: #3498db;
             --bomb-color: #e74c3c;
             --safe-color: #27ae60;
+            --computer-color: #8e44ad;
         }
 
         body {
@@ -26,13 +27,14 @@
             text-align: center;
         }
 
-        h1 { margin-bottom: 10px; }
+        h1 { margin-bottom: 5px; }
         
         #status {
             font-size: 1.2rem;
             margin-bottom: 20px;
             min-height: 50px;
             color: #f1c40f;
+            padding: 0 10px;
         }
 
         /* The Grid */
@@ -42,6 +44,7 @@
             grid-template-rows: repeat(3, 100px);
             gap: 10px;
             margin-bottom: 20px;
+            display: none; /* Hidden until game starts */
         }
 
         .chip {
@@ -55,38 +58,37 @@
             transition: transform 0.1s;
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
             user-select: none;
+            color: #333;
         }
 
         .chip:active { transform: scale(0.95); }
 
         /* Chip States */
-        .chip.selected {
-            border: 5px solid var(--accent-color);
-        }
-
-        .chip.safe {
-            background-color: var(--safe-color);
-            animation: popIn 0.3s;
-        }
-
-        .chip.exploded {
-            background-color: var(--bomb-color);
-            animation: shake 0.5s;
-        }
+        .chip.selected { border: 5px solid var(--accent-color); }
+        .chip.safe { background-color: var(--safe-color); animation: popIn 0.3s; color: white;}
+        .chip.exploded { background-color: var(--bomb-color); animation: shake 0.5s; color: white;}
 
         /* UI Buttons */
-        button {
-            padding: 10px 20px;
+        .btn {
+            padding: 12px 24px;
             font-size: 1rem;
             cursor: pointer;
             background-color: var(--accent-color);
             color: white;
             border: none;
             border-radius: 5px;
-            display: none; /* Hidden by default */
+            margin: 5px;
+            transition: background 0.2s;
         }
+        .btn:hover { background-color: #2980b9; }
+        .btn-hide { display: none; }
 
-        button:hover { background-color: #2980b9; }
+        /* Menu Screen */
+        #menu {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
 
         /* Animations */
         @keyframes shake {
@@ -108,56 +110,55 @@
             100% { transform: scale(1); }
         }
 
-        /* Overlay for passing device */
+        /* Overlay */
         #overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.95);
-            display: flex;
+            display: none;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 10;
-            display: none;
         }
     </style>
 </head>
 <body>
 
     <h1>💣 Bomb Chip Challenge</h1>
-    <div id="status">Welcome! Player 1, get ready to hide your bombs.</div>
+    <div id="status">Select a game mode to start</div>
 
-    <div class="grid" id="gameGrid">
-        </div>
+    <div id="menu">
+        <button class="btn" onclick="startGameMode('PVP')">2 Players (Pass & Play)</button>
+        <button class="btn" onclick="startGameMode('PVC')">1 Player (Vs Computer)</button>
+    </div>
 
-    <button id="actionBtn" onclick="handleAction()">Confirm Hiding Spots</button>
+    <div class="grid" id="gameGrid"></div>
+
+    <button id="actionBtn" class="btn btn-hide" onclick="handleAction()">Confirm Hiding Spots</button>
+    <button id="replayBtn" class="btn btn-hide" onclick="location.reload()">Play Again</button>
 
     <div id="overlay">
-        <h2 id="overlayText">Pass Device to Player 2</h2>
-        <button id="overlayBtn" style="display:block" onclick="dismissOverlay()">Ready</button>
+        <h2 id="overlayText">Pass Device</h2>
+        <button id="overlayBtn" class="btn" onclick="dismissOverlay()">Ready</button>
     </div>
 
     <script>
-        // --- Audio Context for Blast Sound ---
+        // --- Audio Context ---
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         const audioCtx = new AudioContext();
 
         function playBlastSound() {
             if (audioCtx.state === 'suspended') audioCtx.resume();
-            
             const osc = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
-
             osc.connect(gainNode);
             gainNode.connect(audioCtx.destination);
-
             osc.type = 'sawtooth';
             osc.frequency.setValueAtTime(100, audioCtx.currentTime);
             osc.frequency.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
-
             gainNode.gain.setValueAtTime(1, audioCtx.currentTime);
             gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
-
             osc.start();
             osc.stop(audioCtx.currentTime + 0.5);
         }
@@ -180,18 +181,31 @@
         const grid = document.getElementById('gameGrid');
         const statusEl = document.getElementById('status');
         const actionBtn = document.getElementById('actionBtn');
+        const replayBtn = document.getElementById('replayBtn');
+        const menu = document.getElementById('menu');
         const overlay = document.getElementById('overlay');
         const overlayText = document.getElementById('overlayText');
 
-        let gameState = 'SETUP_P1'; // SETUP_P1, SETUP_P2, PLAY_P1, PLAY_P2, GAME_OVER
-        let p1HiddenBombs = []; // Array of indices (0-8)
-        let p2HiddenBombs = [];
-        let p1BombsTriggered = 0; // How many bombs P1 has stepped on
-        let p2BombsTriggered = 0; // How many bombs P2 has stepped on
+        let isVsComputer = false;
+        let gameState = 'MENU'; // MENU, SETUP_P1, SETUP_P2, PLAY_P1, PLAY_P2, PLAY_CPU, GAME_OVER
+        let p1HiddenBombs = [];
+        let p2HiddenBombs = []; // Computer uses this as its bomb array
+        let p1BombsTriggered = 0;
+        let p2BombsTriggered = 0;
         
-        // Tracking revealed tiles (0 = unknown, 1 = safe, 2 = exploded)
+        // 0=unknown, 1=safe, 2=exploded
         let p1ViewOfP2Board = Array(9).fill(0); 
         let p2ViewOfP1Board = Array(9).fill(0);
+
+        function startGameMode(mode) {
+            isVsComputer = (mode === 'PVC');
+            menu.style.display = 'none';
+            grid.style.display = 'grid';
+            initGrid();
+            
+            gameState = 'SETUP_P1';
+            statusEl.innerText = "Player 1: Tap 3 chips to hide your bombs.";
+        }
 
         function initGrid() {
             grid.innerHTML = '';
@@ -205,7 +219,7 @@
         }
 
         function handleChipClick(index) {
-            if (gameState === 'GAME_OVER') return;
+            if (gameState === 'GAME_OVER' || gameState === 'PLAY_CPU') return;
 
             const chips = document.querySelectorAll('.chip');
 
@@ -213,7 +227,6 @@
             if (gameState === 'SETUP_P1' || gameState === 'SETUP_P2') {
                 let currentArray = (gameState === 'SETUP_P1') ? p1HiddenBombs : p2HiddenBombs;
                 
-                // Toggle selection
                 if (currentArray.includes(index)) {
                     currentArray = currentArray.filter(i => i !== index);
                     chips[index].classList.remove('selected');
@@ -226,69 +239,77 @@
                     }
                 }
 
-                // Update the global variable
                 if (gameState === 'SETUP_P1') p1HiddenBombs = currentArray;
                 else p2HiddenBombs = currentArray;
 
-                // Update UI Text
                 let count = currentArray.length;
                 statusEl.innerText = `Hiding Bombs: ${count}/3 placed.`;
-                
-                if (count === 3) {
-                    actionBtn.style.display = 'inline-block';
-                } else {
-                    actionBtn.style.display = 'none';
-                }
+                actionBtn.style.display = (count === 3) ? 'inline-block' : 'none';
             }
 
-            // --- PLAY PHASE ---
+            // --- PLAY PHASE (HUMAN) ---
             else if (gameState === 'PLAY_P1' || gameState === 'PLAY_P2') {
-                let opponentBombs = (gameState === 'PLAY_P1') ? p2HiddenBombs : p1HiddenBombs;
                 let currentView = (gameState === 'PLAY_P1') ? p1ViewOfP2Board : p2ViewOfP1Board;
-
-                // Prevent clicking already revealed tiles
+                
+                // If tile already revealed, ignore
                 if (currentView[index] !== 0) return;
 
-                if (opponentBombs.includes(index)) {
-                    // HIT BOMB!
-                    playBlastSound();
-                    chips[index].classList.add('exploded');
-                    chips[index].innerHTML = "💥";
-                    currentView[index] = 2; // Mark as exploded
-
-                    if (gameState === 'PLAY_P1') {
-                        p1BombsTriggered++;
-                        statusEl.innerText = `P1 stepped on a BOMB! (${p1BombsTriggered}/3)`;
-                    } else {
-                        p2BombsTriggered++;
-                        statusEl.innerText = `P2 stepped on a BOMB! (${p2BombsTriggered}/3)`;
-                    }
-
-                    checkWinCondition();
-                    
-                    // Don't switch turns immediately on bomb? Usually in these games 
-                    // you lose turn. Let's force a turn switch after a delay.
-                    setTimeout(switchTurn, 1500);
-
-                } else {
-                    // SAFE
-                    playSafeSound();
-                    chips[index].classList.add('safe');
-                    currentView[index] = 1; // Mark as safe
-                    statusEl.innerText = "Safe! Switching turns...";
-                    setTimeout(switchTurn, 1000);
-                }
+                processMove(index);
             }
+        }
+
+        function processMove(index) {
+            const chips = document.querySelectorAll('.chip');
+            let isP1Turn = (gameState === 'PLAY_P1');
+            
+            // Determine whose bombs we are checking against
+            let opponentBombs = isP1Turn ? p2HiddenBombs : p1HiddenBombs;
+            let currentView = isP1Turn ? p1ViewOfP2Board : p2ViewOfP1Board;
+            let playerLabel = isP1Turn ? "Player 1" : (isVsComputer ? "Computer" : "Player 2");
+
+            if (opponentBombs.includes(index)) {
+                // HIT BOMB
+                playBlastSound();
+                chips[index].classList.add('exploded');
+                chips[index].innerHTML = "💥";
+                currentView[index] = 2;
+
+                if (isP1Turn) p1BombsTriggered++;
+                else p2BombsTriggered++;
+
+                statusEl.innerText = `${playerLabel} HIT A BOMB!`;
+
+                if (checkWinCondition()) return; // Stop if game ended
+
+            } else {
+                // SAFE
+                playSafeSound();
+                chips[index].classList.add('safe');
+                currentView[index] = 1;
+                statusEl.innerText = `${playerLabel} is Safe.`;
+            }
+
+            // Switch turn delay
+            setTimeout(switchTurn, 1500);
         }
 
         function handleAction() {
             if (gameState === 'SETUP_P1') {
-                showOverlay("Pass device to Player 2", () => {
-                    gameState = 'SETUP_P2';
+                if (isVsComputer) {
+                    // Generate Computer Bombs
+                    computerHideBombs();
+                    gameState = 'PLAY_P1';
                     resetGridVisuals();
-                    statusEl.innerText = "Player 2: Hide your 3 bombs.";
+                    statusEl.innerText = "Game Start! Tap a chip to find Computer's bombs.";
                     actionBtn.style.display = 'none';
-                });
+                } else {
+                    showOverlay("Pass device to Player 2", () => {
+                        gameState = 'SETUP_P2';
+                        resetGridVisuals();
+                        statusEl.innerText = "Player 2: Hide your 3 bombs.";
+                        actionBtn.style.display = 'none';
+                    });
+                }
             } else if (gameState === 'SETUP_P2') {
                 showOverlay("Setup Complete! Pass to Player 1 to start.", () => {
                     gameState = 'PLAY_P1';
@@ -299,29 +320,88 @@
             }
         }
 
+        function computerHideBombs() {
+            p2HiddenBombs = [];
+            while(p2HiddenBombs.length < 3) {
+                let r = Math.floor(Math.random() * 9);
+                if(!p2HiddenBombs.includes(r)) p2HiddenBombs.push(r);
+            }
+        }
+
         function switchTurn() {
             if (gameState === 'GAME_OVER') return;
 
             if (gameState === 'PLAY_P1') {
-                showOverlay("Pass device to Player 2", () => {
-                    gameState = 'PLAY_P2';
-                    renderBoardState(p2ViewOfP1Board);
-                    statusEl.innerText = `Player 2's Turn (Bombs hit: ${p2BombsTriggered}/3)`;
-                });
+                // P1 just finished. Now it's P2 or CPU.
+                if (isVsComputer) {
+                    // CPU Turn
+                    gameState = 'PLAY_CPU';
+                    
+                    // Show P1's board (so P1 can see where they are getting hit)
+                    // We render p2ViewOfP1Board (which tracks what CPU has seen of P1)
+                    // BUT we also want to show P1 where their hidden bombs are (transparency)
+                    renderBoardState(p2ViewOfP1Board, p1HiddenBombs); 
+                    statusEl.innerText = `Computer's Turn...`;
+                    
+                    setTimeout(computerAI, 1000);
+
+                } else {
+                    // P2 Turn (Human)
+                    showOverlay("Pass device to Player 2", () => {
+                        gameState = 'PLAY_P2';
+                        renderBoardState(p2ViewOfP1Board); // Show what P2 has revealed of P1
+                        statusEl.innerText = `Player 2's Turn (Bombs hit: ${p2BombsTriggered}/3)`;
+                    });
+                }
             } else {
-                showOverlay("Pass device to Player 1", () => {
+                // P2/CPU just finished. Back to P1.
+                if (isVsComputer) {
                     gameState = 'PLAY_P1';
-                    renderBoardState(p1ViewOfP2Board);
-                    statusEl.innerText = `Player 1's Turn (Bombs hit: ${p1BombsTriggered}/3)`;
-                });
+                    renderBoardState(p1ViewOfP2Board); // Show what P1 has revealed of CPU
+                    statusEl.innerText = `Your Turn (Bombs hit: ${p1BombsTriggered}/3)`;
+                } else {
+                    showOverlay("Pass device to Player 1", () => {
+                        gameState = 'PLAY_P1';
+                        renderBoardState(p1ViewOfP2Board);
+                        statusEl.innerText = `Player 1's Turn (Bombs hit: ${p1BombsTriggered}/3)`;
+                    });
+                }
             }
         }
 
-        function renderBoardState(viewArray) {
+        function computerAI() {
+            // Find valid moves (indices where view is 0)
+            let validMoves = [];
+            for(let i=0; i<9; i++) {
+                if(p2ViewOfP1Board[i] === 0) validMoves.push(i);
+            }
+
+            if(validMoves.length > 0) {
+                let randomMove = validMoves[Math.floor(Math.random() * validMoves.length)];
+                
+                // Reuse processMove logic. 
+                // Note: processMove checks gameState to know who is playing.
+                // We are in PLAY_CPU state, which isn't PLAY_P1, so processMove treats it as P2/CPU.
+                processMove(randomMove);
+            }
+        }
+
+        // Render the board based on what has been revealed.
+        // optionalRevealArray: Used in Vs Computer mode so P1 can see their own hidden bombs while CPU plays.
+        function renderBoardState(viewArray, optionalHiddenBombs = []) {
             const chips = document.querySelectorAll('.chip');
             chips.forEach((chip, i) => {
-                chip.className = 'chip'; // Reset classes
+                chip.className = 'chip'; // Reset
                 chip.innerHTML = '';
+                
+                // If it's P1 watching CPU play, show P1's hidden bombs faintly
+                if (optionalHiddenBombs.includes(i) && viewArray[i] === 0) {
+                    chip.innerHTML = "💣";
+                    chip.style.opacity = "0.5"; 
+                } else {
+                    chip.style.opacity = "1";
+                }
+
                 if (viewArray[i] === 1) {
                     chip.classList.add('safe');
                 } else if (viewArray[i] === 2) {
@@ -336,15 +416,19 @@
             chips.forEach(chip => {
                 chip.className = 'chip';
                 chip.innerHTML = '';
+                chip.style.opacity = "1";
             });
         }
 
         function checkWinCondition() {
             if (p1BombsTriggered === 3) {
-                endGame("Player 1 tapped 3 bombs. Player 2 WINS!");
+                endGame(isVsComputer ? "You hit 3 bombs. Computer WINS!" : "Player 1 hit 3 bombs. Player 2 WINS!");
+                return true;
             } else if (p2BombsTriggered === 3) {
-                endGame("Player 2 tapped 3 bombs. Player 1 WINS!");
+                endGame(isVsComputer ? "Computer hit 3 bombs. YOU WIN!" : "Player 2 hit 3 bombs. Player 1 WINS!");
+                return true;
             }
+            return false;
         }
 
         function endGame(msg) {
@@ -352,6 +436,7 @@
             statusEl.innerText = msg;
             statusEl.style.color = '#e74c3c';
             statusEl.style.fontWeight = 'bold';
+            replayBtn.style.display = 'inline-block';
         }
 
         function showOverlay(text, callback) {
@@ -366,9 +451,6 @@
         function dismissOverlay() {
             overlay.style.display = 'none';
         }
-
-        // Start
-        initGrid();
 
     </script>
 </body>
