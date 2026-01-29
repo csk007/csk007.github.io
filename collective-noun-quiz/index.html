@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noun Explorer Pro</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root { --primary: #2c3e50; --accent: #e67e22; --bg: #fdfcfb; --text: #34495e; --fav: #e74c3c; --edit: #3498db; --pdf: #27ae60; --quiz: #8e44ad; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); padding: 20px; color: var(--text); line-height: 1.6; }
+        
+        /* Header & Nav */
+        .header { text-align: center; margin-bottom: 20px; }
+        .btn-group { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 15px; }
+        .btn { padding: 10px 20px; cursor: pointer; border-radius: 6px; border: none; font-weight: bold; transition: 0.2s; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .btn-quiz { background: var(--quiz); }
+        .btn-pdf { background: var(--pdf); }
+        .btn-edit { background: var(--edit); }
+        .btn-save { background: #27ae60; }
+        .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+        /* JSON Editor Panel */
+        #editor-container { display: none; width: 100%; max-width: 900px; margin: 20px auto; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid #ddd; }
+        textarea { width: 100%; height: 400px; font-family: 'Consolas', monospace; font-size: 13px; padding: 15px; border: 1px solid #ccc; border-radius: 8px; margin-bottom: 15px; background: #f9f9f9; }
+
+        /* Quiz UI */
+        #quiz-container { display: none; width: 100%; max-width: 600px; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.15); margin: 20px auto; text-align: center; }
+        #timer-bar { width: 100%; height: 10px; background: var(--quiz); transition: width 0.1s linear; margin-bottom: 25px; border-radius: 5px; }
+        .quiz-options { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 25px; }
+        .opt-btn { padding: 18px; border: 2px solid #f0f0f0; border-radius: 12px; background: #fff; cursor: pointer; font-weight: 600; font-size: 1em; }
+        .opt-btn:hover { border-color: var(--quiz); background: #fdfaff; }
+
+        /* Main List UI */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; max-width: 1200px; margin: 30px auto; }
+        .card { background: white; padding: 20px; border-radius: 15px; border: 1px solid #eee; box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: 0.3s; }
+        .card:hover { transform: translateY(-3px); border-color: var(--accent); }
+        .category-tag { font-size: 0.7rem; text-transform: uppercase; font-weight: bold; color: #95a5a6; margin-bottom: 5px; display: block; }
+        .group-name { font-weight: 800; font-size: 1.2em; color: var(--accent); }
+        .subject-name { color: var(--primary); font-weight: 500; font-size: 1.1em; }
+    </style>
+</head>
+<body>
+
+    <div class="header" id="main-header">
+        <h1>Collective Noun Encyclopedia</h1>
+        <div class="btn-group">
+            <button class="btn btn-quiz" onclick="showQuizConfig()">⚡ Blitz Quiz</button>
+            <button class="btn btn-pdf" onclick="generatePDF()">📥 Export PDF</button>
+            <button class="btn btn-edit" onclick="toggleEditor()">⚙ Edit Data</button>
+        </div>
+    </div>
+
+    <div id="editor-container">
+        <h3>Master JSON Data</h3>
+        <p style="font-size: 0.8rem; color: #666;">Modify your list below. Use valid JSON format.</p>
+        <textarea id="json-input"></textarea>
+        <div class="btn-group">
+            <button class="btn btn-save" onclick="saveJSON()">Save Changes</button>
+            <button class="btn" style="background:#555" onclick="resetData()">Reset to Defaults</button>
+            <button class="btn" style="background:#333" onclick="toggleEditor()">Close</button>
+        </div>
+    </div>
+
+    <div id="quiz-config" style="display:none; text-align:center; padding: 40px; background:white; border-radius:20px; max-width:500px; margin: 20px auto; box-shadow:0 10px 30px rgba(0,0,0,0.1);">
+        <h2>Select Quiz Mode</h2>
+        <button class="btn btn-quiz" style="margin:10px" onclick="startQuiz('normal')">A [Group] of...?</button>
+        <button class="btn btn-quiz" style="margin:10px" onclick="startQuiz('reverse')">A group of [Subject] is...?</button>
+        <br><button class="btn" style="background:#333; margin-top:15px;" onclick="hideQuizConfig()">Cancel</button>
+    </div>
+
+    <div id="quiz-container">
+        <div id="timer-bar"></div>
+        <div id="quiz-content">
+            <div id="q-text" style="font-size: 1.6em; font-weight: bold; margin-bottom: 25px;"></div>
+            <div class="quiz-options" id="q-options"></div>
+            <p style="margin-top:20px; font-weight:bold; font-size: 1.2em;">Score: <span id="q-score" style="color:var(--quiz)">0</span></p>
+        </div>
+        <div id="game-over" style="display:none;">
+            <h2 style="color:var(--fav)">Game Over!</h2>
+            <p id="final-result" style="font-weight:bold; font-size: 1.2em;"></p>
+            <button class="btn btn-quiz" onclick="showQuizConfig()">Play Again</button>
+            <button class="btn" style="background:#333" onclick="exitQuiz()">Exit</button>
+        </div>
+    </div>
+
+    <div id="main-ui">
+        <div style="text-align:center;"><input type="text" id="search" style="width:100%; max-width:500px; padding:12px 20px; border-radius:50px; border:2px solid #ddd;" placeholder="Search for a group or subject..."></div>
+        <div class="grid" id="main-container"></div>
+    </div>
+
+    <script>
+        const defaultList = [
+            // --- ANIMALS ---
+            { id: 1, group: "Herd", subject: "Cows", cat: "Animals" },
+            { id: 2, group: "Herd", subject: "Elephants", cat: "Animals" },
+            { id: 3, group: "Herd", subject: "Deer", cat: "Animals" },
+            { id: 4, group: "Pack", subject: "Dogs", cat: "Animals" },
+            { id: 5, group: "Pack", subject: "Wolves", cat: "Animals" },
+            { id: 6, group: "Flock", subject: "Birds", cat: "Animals" },
+            { id: 7, group: "Flock", subject: "Sheep", cat: "Animals" },
+            { id: 8, group: "Flock", subject: "Camels", cat: "Animals" },
+            { id: 9, group: "Pride", subject: "Lions", cat: "Animals" },
+            { id: 10, group: "Pride", subject: "Peacocks", cat: "Animals" },
+            { id: 11, group: "Swarm", subject: "Bees", cat: "Animals" },
+            { id: 12, group: "Swarm", subject: "Butterflies", cat: "Animals" },
+            { id: 13, group: "Cluster", subject: "Cats", cat: "Animals" },
+            { id: 14, group: "Litter", subject: "Kittens", cat: "Animals" },
+            { id: 15, group: "Litter", subject: "Puppies", cat: "Animals" },
+            { id: 16, group: "Shoal", subject: "Fish", cat: "Animals" },
+            { id: 17, group: "Troop", subject: "Monkeys", cat: "Animals" },
+            { id: 18, group: "Chatter", subject: "Monkeys", cat: "Animals" },
+            { id: 19, group: "Colony", subject: "Ants", cat: "Animals" },
+            { id: 20, group: "Array", subject: "Ants", cat: "Animals" },
+            { id: 21, group: "Colony", subject: "Rabbits", cat: "Animals" },
+            { id: 22, group: "Parliament", subject: "Owls", cat: "Animals" },
+            { id: 23, group: "Murder", subject: "Crows", cat: "Animals" },
+            // --- THINGS ---
+            { id: 24, group: "Library", subject: "Books", cat: "Things" },
+            { id: 25, group: "Network", subject: "Computers", cat: "Things" },
+            { id: 26, group: "Flight", subject: "Stairs", cat: "Things" },
+            { id: 27, group: "Fleet", subject: "Ships", cat: "Things" },
+            { id: 28, group: "Range", subject: "Mountains", cat: "Things" },
+            { id: 29, group: "Clump", subject: "Trees", cat: "Things" },
+            { id: 30, group: "Bouquet", subject: "Flowers", cat: "Things" },
+            { id: 31, group: "Bunch", subject: "Flowers", cat: "Things" },
+            { id: 32, group: "Bunch", subject: "Keys", cat: "Things" },
+            { id: 33, group: "Bunch", subject: "Grapes", cat: "Things" },
+            { id: 34, group: "Bunch", subject: "Bananas", cat: "Things" },
+            { id: 35, group: "String", subject: "Pearls", cat: "Things" },
+            { id: 36, group: "Galaxy", subject: "Stars", cat: "Things" },
+            // --- PEOPLE ---
+            { id: 37, group: "Army", subject: "Soldiers", cat: "People" },
+            { id: 38, group: "Crew", subject: "Sailors", cat: "People" },
+            { id: 39, group: "Team", subject: "Players", cat: "People" },
+            { id: 40, group: "Gang", subject: "Thieves", cat: "People" },
+            { id: 41, group: "Crowd", subject: "People", cat: "People" },
+            { id: 42, group: "Staff", subject: "Teachers", cat: "People" },
+            { id: 43, group: "Group", subject: "Children", cat: "People" },
+            { id: 44, group: "Band", subject: "Musicians", cat: "People" },
+            { id: 45, group: "Troupe", subject: "Dancers", cat: "People" },
+            { id: 46, group: "Choir", subject: "Singers", cat: "People" }
+        ];
+
+        let nounData = JSON.parse(localStorage.getItem('nounData_v3')) || defaultList;
+        let score = 0;
+        let quizType = 'normal';
+        let timer;
+        let timeLeft;
+
+        function render() {
+            const container = document.getElementById('main-container');
+            const search = document.getElementById('search').value.toLowerCase();
+            container.innerHTML = '';
+            
+            const filtered = nounData.filter(i => 
+                i.group.toLowerCase().includes(search) || i.subject.toLowerCase().includes(search)
+            );
+
+            filtered.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `<span class="category-tag">${item.cat}</span>
+                                 <span class="group-name">A ${item.group}</span> <br> of <span class="subject-name">${item.subject}</span>`;
+                container.appendChild(card);
+            });
+        }
+
+        /* Editor Functions */
+        function toggleEditor() {
+            const el = document.getElementById('editor-container');
+            el.style.display = el.style.display === 'block' ? 'none' : 'block';
+            document.getElementById('json-input').value = JSON.stringify(nounData, null, 4);
+        }
+
+        function saveJSON() {
+            try {
+                nounData = JSON.parse(document.getElementById('json-input').value);
+                localStorage.setItem('nounData_v3', JSON.stringify(nounData));
+                render();
+                toggleEditor();
+            } catch (e) { alert("Invalid JSON format!"); }
+        }
+
+        function resetData() {
+            if(confirm("Are you sure you want to reset to the split-pair defaults?")) {
+                nounData = [...defaultList];
+                localStorage.setItem('nounData_v3', JSON.stringify(nounData));
+                render();
+                toggleEditor();
+            }
+        }
+
+        /* Quiz Functions */
+        function showQuizConfig() {
+            document.getElementById('main-ui').style.display = 'none';
+            document.getElementById('quiz-config').style.display = 'block';
+        }
+
+        function hideQuizConfig() {
+            document.getElementById('main-ui').style.display = 'block';
+            document.getElementById('quiz-config').style.display = 'none';
+        }
+
+        function startQuiz(type) {
+            quizType = type;
+            score = 0;
+            document.getElementById('quiz-config').style.display = 'none';
+            document.getElementById('quiz-container').style.display = 'block';
+            document.getElementById('quiz-content').style.display = 'block';
+            document.getElementById('game-over').style.display = 'none';
+            nextQuestion();
+        }
+
+        function nextQuestion() {
+            clearInterval(timer);
+            timeLeft = 100;
+            const correct = nounData[Math.floor(Math.random() * nounData.length)];
+            
+            document.getElementById('q-text').innerText = (quizType === 'normal') 
+                ? `A "${correct.group}" of ...?` 
+                : `A group of "${correct.subject}" is a ...?`;
+
+            const key = (quizType === 'normal') ? 'subject' : 'group';
+            const options = [correct[key]];
+            while(options.length < 4) {
+                const rand = nounData[Math.floor(Math.random() * nounData.length)][key];
+                if(!options.includes(rand)) options.push(rand);
+            }
+            options.sort(() => Math.random() - 0.5);
+
+            const optDiv = document.getElementById('q-options');
+            optDiv.innerHTML = '';
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'opt-btn';
+                btn.innerText = opt;
+                btn.onclick = () => {
+                    if(opt === correct[key]) {
+                        score++;
+                        document.getElementById('q-score').innerText = score;
+                        nextQuestion();
+                    } else { gameOver(); }
+                };
+                optDiv.appendChild(btn);
+            });
+
+            timer = setInterval(() => {
+                timeLeft -= 1.2;
+                document.getElementById('timer-bar').style.width = timeLeft + '%';
+                if(timeLeft <= 0) gameOver();
+            }, 100);
+        }
+
+        function gameOver() {
+            clearInterval(timer);
+            document.getElementById('quiz-content').style.display = 'none';
+            document.getElementById('game-over').style.display = 'block';
+            document.getElementById('final-result').innerText = `Final Score: ${score}`;
+        }
+
+        function exitQuiz() {
+            document.getElementById('quiz-container').style.display = 'none';
+            document.getElementById('main-ui').style.display = 'block';
+        }
+
+        async function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.setFontSize(20);
+            doc.text("Collective Noun Study Sheet", 20, 20);
+            doc.setFontSize(12);
+            nounData.forEach((item, i) => {
+                if(i < 30) doc.text(`${i+1}. A ${item.group} of ${item.subject}`, 20, 35 + (i*8));
+            });
+            doc.save("CollectiveNouns.pdf");
+        }
+
+        document.getElementById('search').addEventListener('input', render);
+        render();
+    </script>
+</body>
+  </html>
+  
