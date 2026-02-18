@@ -12,13 +12,17 @@
         .header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; position: sticky; top: 0; background: white; padding: 10px 0; z-index: 10; border-bottom: 2px solid #eee; }
         .score-box { background: var(--primary); color: white; padding: 8px 20px; border-radius: 50px; font-weight: bold; }
         
-        /* Progress Bar */
         .progress-container { width: 100%; background-color: #eee; border-radius: 10px; margin-bottom: 20px; height: 10px; overflow: hidden; }
         .progress-bar { height: 100%; width: 0%; background-color: var(--success); transition: width 0.3s ease; }
 
+        .voice-section { background: #e8f0fe; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid var(--primary); display: flex; flex-wrap: wrap; gap: 20px; align-items: center; }
+        .voice-select { flex-grow: 1; padding: 10px; border-radius: 6px; border: 1px solid #ccc; }
+        
+        .repeat-toggle { display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: bold; }
+
         textarea { width: 100%; height: 70px; padding: 12px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; margin-bottom: 10px; }
         .controls { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        select { flex-grow: 1; padding: 10px; border-radius: 6px; border: 1px solid #ccc; }
+        .saved-select { flex-grow: 1; padding: 10px; border-radius: 6px; border: 1px solid #ccc; }
         
         button { padding: 10px 18px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s; }
         .btn-primary { background: var(--primary); color: white; }
@@ -34,12 +38,11 @@
 
         .blurred { filter: blur(5px); background: #eee; cursor: pointer; user-select: none; border-radius: 4px; padding: 2px 8px; font-size: 0.8rem; }
         .blurred.revealed { filter: blur(0); background: transparent; }
-        .play-btn { background: var(--success); color: white; border-radius: 50%; width: 35px; height: 35px; }
+        .play-btn { background: var(--success); color: white; border-radius: 50%; width: 40px; height: 40px; font-size: 1.2rem; }
 
-        /* Modal Styles */
         #resultModal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); }
-        .modal-content { background: white; margin: 15% auto; padding: 30px; border-radius: 15px; width: 300px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        .grade { font-size: 3rem; font-weight: bold; margin: 10px 0; color: var(--primary); }
+        .modal-content { background: white; margin: 15% auto; padding: 30px; border-radius: 15px; width: 320px; text-align: center; }
+        .grade { font-size: 3.5rem; font-weight: bold; margin: 10px 0; color: var(--primary); }
     </style>
 </head>
 <body>
@@ -54,11 +57,21 @@
         <div class="progress-bar" id="progressBar"></div>
     </div>
 
+    <div class="voice-section">
+        <div style="flex: 1; min-width: 200px;">
+            <label><strong>Speaker Voice:</strong></label>
+            <select id="voiceSelect" class="voice-select"></select>
+        </div>
+        <label class="repeat-toggle">
+            <input type="checkbox" id="autoRepeat"> Auto-Repeat (3x)
+        </label>
+    </div>
+
     <div class="input-section">
         <textarea id="wordInput" placeholder="Enter words separated by commas..."></textarea>
         <div class="controls">
             <button class="btn-primary" onclick="saveAndGenerate()">Start Game</button>
-            <select id="savedLists" onchange="loadSavedList()">
+            <select id="savedLists" class="saved-select" onchange="loadSavedList()">
                 <option value="">-- Saved Lists --</option>
             </select>
             <button class="btn-danger" onclick="deleteList()">Delete</button>
@@ -66,7 +79,7 @@
     </div>
 
     <div id="gameArea" style="display:none;">
-        <table id="gameTable">
+        <table>
             <thead>
                 <tr>
                     <th>#</th>
@@ -77,7 +90,7 @@
             </thead>
             <tbody id="tableBody"></tbody>
         </table>
-        <button class="btn-finish" onclick="finishGame()">Finish Game & Get Grade</button>
+        <button class="btn-finish" onclick="finishGame()">Finish & Get Grade</button>
     </div>
 </div>
 
@@ -92,8 +105,28 @@
 </div>
 
 <script>
-    const STORAGE_KEY = 'spell_master_data_v2';
-    window.onload = updateDropdown;
+    const STORAGE_KEY = 'spell_master_v3';
+    let voices = [];
+    const synth = window.speechSynthesis;
+
+    function populateVoiceList() {
+        voices = synth.getVoices();
+        const voiceSelect = document.getElementById('voiceSelect');
+        const currentSelection = voiceSelect.value;
+        voiceSelect.innerHTML = '';
+        voices.forEach((voice, i) => {
+            const option = document.createElement('option');
+            option.textContent = `${voice.name} (${voice.lang})`;
+            option.value = i;
+            voiceSelect.appendChild(option);
+        });
+        if (currentSelection) voiceSelect.value = currentSelection;
+    }
+
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+        speechSynthesis.onvoiceschanged = populateVoiceList;
+    }
+    window.onload = () => { populateVoiceList(); updateDropdown(); };
 
     function saveAndGenerate() {
         const input = document.getElementById('wordInput').value.trim();
@@ -114,11 +147,10 @@
         document.getElementById('totalWords').textContent = words.length;
         document.getElementById('currentScore').textContent = "0";
         document.getElementById('progressBar').style.width = "0%";
-
         words.forEach((word, index) => {
             const row = `<tr>
                 <td>${index + 1}</td>
-                <td><button class="play-btn" onclick="speak('${word.replace(/'/g, "\\'")}')">🔊</button></td>
+                <td><button class="play-btn" onclick="handleSpeak('${word.replace(/'/g, "\\'")}')">🔊</button></td>
                 <td><input type="text" class="spell-input" oninput="checkSpelling(this, '${word.replace(/'/g, "\\'")}')"></td>
                 <td><span class="blurred" onclick="this.classList.toggle('revealed')">${word}</span></td>
             </tr>`;
@@ -129,8 +161,7 @@
 
     function checkSpelling(inputEl, correctWord) {
         const val = inputEl.value.trim().toLowerCase();
-        const target = correctWord.toLowerCase();
-        if (val === target) { inputEl.classList.add('correct'); inputEl.classList.remove('wrong'); }
+        if (val === correctWord.toLowerCase()) { inputEl.classList.add('correct'); inputEl.classList.remove('wrong'); }
         else if (val === "") { inputEl.classList.remove('correct', 'wrong'); }
         else { inputEl.classList.add('wrong'); inputEl.classList.remove('correct'); }
         updateUI();
@@ -143,20 +174,39 @@
         document.getElementById('progressBar').style.width = (correct / total * 100) + "%";
     }
 
+    function handleSpeak(word) {
+        synth.cancel();
+        const repeat = document.getElementById('autoRepeat').checked;
+        if (repeat) {
+            speak(word);
+            setTimeout(() => speak(word), 1500);
+            setTimeout(() => speak(word), 3000);
+        } else {
+            speak(word);
+        }
+    }
+
+    function speak(word) {
+        const utter = new SpeechSynthesisUtterance(word);
+        const selectedVoice = voices[document.getElementById('voiceSelect').value];
+        if (selectedVoice) utter.voice = selectedVoice;
+        utter.volume = 1;
+        utter.rate = 0.85;
+        synth.speak(utter);
+    }
+
     function finishGame() {
         const correct = document.querySelectorAll('.spell-input.correct').length;
         const total = parseInt(document.getElementById('totalWords').textContent);
         const percent = (correct / total) * 100;
         let grade = "F", msg = "Keep practicing!";
-
         if (percent === 100) { grade = "A+"; msg = "Perfect Score!"; }
-        else if (percent >= 80) { grade = "A"; msg = "Excellent Work!"; }
-        else if (percent >= 60) { grade = "B"; msg = "Good Effort!"; }
-        else if (percent >= 40) { grade = "C"; msg = "Need more practice."; }
-
+        else if (percent >= 80) { grade = "A"; msg = "Excellent!"; }
+        else if (percent >= 60) { grade = "B"; msg = "Good Job!"; }
+        else if (percent >= 40) { grade = "C"; msg = "Keep trying!"; }
         document.getElementById('finalGrade').textContent = grade;
         document.getElementById('finalMessage').textContent = msg;
-        document.getElementById('finalStats').textContent = `Correct: ${correct} / Total: ${total}`;
+        document.getElementById('finalStats').textContent = `Result: ${correct} / ${total}`;
         document.getElementById('resultModal').style.display = "block";
     }
 
@@ -186,15 +236,7 @@
         document.getElementById('gameArea').style.display = 'none';
     }
 
-    function speak(word) {
-        window.speechSynthesis.cancel();
-        const msg = new SpeechSynthesisUtterance(word);
-        msg.rate = 0.8;
-        window.speechSynthesis.speak(msg);
-    }
-
     function closeModal() { document.getElementById('resultModal').style.display = "none"; }
 </script>
 </body>
     </html>
-    
