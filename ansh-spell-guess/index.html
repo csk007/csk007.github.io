@@ -3,33 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Spelling Bee Game</title>
+    <title>Pro Spelling Bee - Speed Control</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background: #f0f2f5; color: #333; }
+        body { font-family: 'Segoe UI', sans-serif; padding: 20px; background: #f0f2f5; color: #333; }
         .container { max-width: 650px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-        h1 { text-align: center; color: #1a73e8; margin-bottom: 25px; }
+        h1 { text-align: center; color: #1a73e8; }
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: bold; }
         input[type="text"], textarea, select { width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; }
         textarea { height: 80px; resize: none; }
-        .controls { display: flex; gap: 10px; margin-top: 10px; }
-        button { flex: 1; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 15px; font-weight: 600; transition: 0.2s; }
+        
+        /* Slider Styling */
+        .settings-row { display: flex; gap: 20px; margin-bottom: 20px; background: #f8f9fa; padding: 15px; border-radius: 8px; }
+        .slider-group { flex: 1; }
+        input[type="range"] { width: 100%; cursor: pointer; }
+        .slider-val { font-size: 0.8em; color: #666; float: right; }
+
+        .controls { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+        button { flex: 1; min-width: 120px; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; transition: 0.2s; }
         .btn-start { background: #1a73e8; color: white; }
         .btn-save { background: #34a853; color: white; }
-        .btn-finish { background: #1a73e8; color: white; margin-top: 20px; }
-        button:hover { opacity: 0.9; }
-        .hidden { display: none; }
+        .btn-review { background: #9b59b6; color: white; margin-top: 10px; width: 100%; }
+        .btn-finish { background: #1a73e8; color: white; margin-top: 20px; width: 100%; }
         
-        /* Serial Number Styling */
+        #timer-display { text-align: right; font-weight: bold; color: #d93025; font-family: monospace; font-size: 1.2em; margin-bottom: 10px; }
         .word-row { display: flex; align-items: center; margin-bottom: 15px; gap: 12px; }
         .serial-number { font-weight: bold; min-width: 25px; color: #5f6368; }
-        
         .word-input { padding: 10px; border: 2px solid #ccc; border-radius: 6px; flex-grow: 1; font-size: 16px; }
         .correct { border-color: #34a853 !important; background-color: #e6f4ea; }
         .wrong { border-color: #d93025 !important; background-color: #fce8e6; }
-        #score-display { font-weight: bold; font-size: 1.3em; text-align: center; margin-top: 20px; }
-        .btn-play { background: #f8f9fa; border: 1px solid #dadce0; color: #3c4043; min-width: 50px; }
-        .saved-section { border-top: 1px solid #eee; margin-top: 20px; padding-top: 20px; }
+        #score-display { font-weight: bold; font-size: 1.2em; text-align: center; margin-top: 20px; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
@@ -39,137 +43,164 @@
 
     <div id="setup-section">
         <div class="form-group">
-            <label>List Title (optional):</label>
-            <input type="text" id="list-title" placeholder="e.g., Science Vocabulary">
+            <label>List Title:</label>
+            <input type="text" id="list-title" placeholder="e.g., Hard Words">
         </div>
-        
         <div class="form-group">
-            <label>Words (separated by spaces or commas):</label>
-            <textarea id="word-input-area" placeholder="galaxy atom molecule..."></textarea>
+            <label>Words:</label>
+            <textarea id="word-input-area" placeholder="space or comma separated..."></textarea>
+        </div>
+
+        <div class="settings-row">
+            <div class="slider-group">
+                <label>Speech Speed <span id="speed-val" class="slider-val">1.0x</span></label>
+                <input type="range" id="speech-rate" min="0.5" max="2" step="0.1" value="1" oninput="document.getElementById('speed-val').innerText = this.value + 'x'">
+            </div>
+            <div class="slider-group">
+                <label>Pitch <span id="pitch-val" class="slider-val">1.0</span></label>
+                <input type="range" id="speech-pitch" min="0.1" max="2" step="0.1" value="1" oninput="document.getElementById('pitch-val').innerText = this.value">
+            </div>
         </div>
 
         <div class="controls">
             <button class="btn-save" onclick="saveList()">Save List</button>
             <button class="btn-start" onclick="startGame()">Start Game</button>
         </div>
-
-        <div class="saved-section">
-            <label>Load a saved list:</label>
+        <div class="form-group" style="margin-top:20px;">
             <select id="saved-lists-dropdown" onchange="loadSelectedList()">
-                <option value="">-- Select a saved list --</option>
+                <option value="">-- Load Saved List --</option>
             </select>
         </div>
     </div>
 
     <div id="game-section" class="hidden">
+        <div id="timer-display">Time: 00:00</div>
         <h2 id="current-game-title" style="text-align: center;"></h2>
         <div id="word-list-container"></div>
-        <button class="btn-finish" onclick="finishGame()">Finish & Score</button>
-        <button onclick="resetGame()" style="background:#dadce0; color:#3c4043; margin-top: 10px;">Back to Menu</button>
+        <button class="btn-finish" onclick="finishGame()">Finish</button>
         <div id="score-display"></div>
+        <button id="review-btn" class="btn-review hidden" onclick="startReview()">Review Mistakes</button>
+        <button onclick="resetGame()" style="background:#dadce0; margin-top: 10px; width:100%; border:none; padding:10px; border-radius:6px; cursor:pointer;">Main Menu</button>
     </div>
 </div>
 
 <script>
     let targetWords = [];
+    let missedWords = [];
     let savedData = JSON.parse(localStorage.getItem('spellingGameData') || '[]');
+    let startTime, timerInterval, totalSeconds;
 
-    window.onload = updateDropdown;
+    window.onload = () => { updateDropdown(); checkURLParams(); };
+
+    function checkURLParams() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('words')) {
+            document.getElementById('word-input-area').value = decodeURIComponent(urlParams.get('words'));
+            document.getElementById('list-title').value = decodeURIComponent(urlParams.get('title') || '');
+        }
+    }
+
+    function startTimer() {
+        startTime = Date.now();
+        timerInterval = setInterval(() => {
+            totalSeconds = Math.floor((Date.now() - startTime) / 1000);
+            const mins = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+            const secs = String(totalSeconds % 60).padStart(2, '0');
+            document.getElementById('timer-display').innerText = `Time: ${mins}:${secs}`;
+        }, 1000);
+    }
 
     function saveList() {
-        const title = document.getElementById('list-title').value || "Untitled List";
-        const content = document.getElementById('word-input-area').value;
-        const timestamp = new Date().toLocaleString();
-
-        if (!content.trim()) return alert("Please enter words to save.");
-
-        const newList = {
-            id: Date.now(),
-            title: title,
-            words: content,
-            time: timestamp
-        };
-
-        savedData.push(newList);
+        const title = document.getElementById('list-title').value || "Untitled";
+        const words = document.getElementById('word-input-area').value;
+        if (!words.trim()) return;
+        savedData.push({ id: Date.now(), title, words, time: new Date().toLocaleString() });
         localStorage.setItem('spellingGameData', JSON.stringify(savedData));
         updateDropdown();
-        alert("List saved!");
+        alert("Saved!");
     }
 
     function updateDropdown() {
         const dropdown = document.getElementById('saved-lists-dropdown');
-        dropdown.innerHTML = '<option value="">-- Select a saved list --</option>';
+        dropdown.innerHTML = '<option value="">-- Load Saved List --</option>';
         savedData.forEach(item => {
-            const option = document.createElement('option');
-            option.value = item.id;
-            option.textContent = `${item.title} (${item.time})`;
-            dropdown.appendChild(option);
+            const opt = document.createElement('option');
+            opt.value = item.id;
+            opt.textContent = `${item.title} (${item.time})`;
+            dropdown.appendChild(opt);
         });
     }
 
     function loadSelectedList() {
-        const selectedId = document.getElementById('saved-lists-dropdown').value;
-        const list = savedData.find(item => item.id == selectedId);
+        const list = savedData.find(item => item.id == document.getElementById('saved-lists-dropdown').value);
         if (list) {
             document.getElementById('list-title').value = list.title;
             document.getElementById('word-input-area').value = list.words;
         }
     }
 
-    function startGame() {
-        const input = document.getElementById('word-input-area').value;
-        if (!input.trim()) return alert("Please enter or select words.");
-
-        targetWords = input.split(/[ ,]+/).filter(word => word.length > 0);
-        document.getElementById('current-game-title').innerText = document.getElementById('list-title').value || "Spelling Test";
+    function startGame(wordsToUse = null) {
+        const input = wordsToUse || document.getElementById('word-input-area').value;
+        if (!input.trim()) return;
         
+        targetWords = wordsToUse ? wordsToUse.split(',') : input.split(/[ ,]+/).filter(w => w.length > 0);
+        
+        document.getElementById('current-game-title').innerText = wordsToUse ? "Review Mode" : (document.getElementById('list-title').value || "Spelling Test");
         document.getElementById('setup-section').classList.add('hidden');
         document.getElementById('game-section').classList.remove('hidden');
-        renderWordInputs();
-    }
+        document.getElementById('review-btn').classList.add('hidden');
+        document.getElementById('score-display').innerText = '';
 
-    function renderWordInputs() {
         const container = document.getElementById('word-list-container');
         container.innerHTML = '';
         targetWords.forEach((word, index) => {
             const row = document.createElement('div');
             row.className = 'word-row';
-            row.innerHTML = `
-                <span class="serial-number">${index + 1}.</span>
-                <button class="btn-play" onclick="speakWord('${word}')">🔊</button>
-                <input type="text" class="word-input" id="guess-${index}" autocomplete="off" placeholder="Type here...">
-            `;
+            row.innerHTML = `<span class="serial-number">${index + 1}.</span>
+                <button style="min-width:40px; cursor:pointer;" onclick="speakWord('${word}')">🔊</button>
+                <input type="text" class="word-input" id="guess-${index}" autocomplete="off">`;
             container.appendChild(row);
         });
+        startTimer();
     }
 
-    function speakWord(word) {
-        const msg = new SpeechSynthesisUtterance(word);
-        window.speechSynthesis.speak(msg);
+    function speakWord(word) { 
+        const utterance = new SpeechSynthesisUtterance(word);
+        utterance.rate = document.getElementById('speech-rate').value;
+        utterance.pitch = document.getElementById('speech-pitch').value;
+        window.speechSynthesis.speak(utterance); 
     }
 
     function finishGame() {
+        clearInterval(timerInterval);
         let score = 0;
+        missedWords = [];
+        
         targetWords.forEach((word, index) => {
-            const inputField = document.getElementById(`guess-${index}`);
-            const userGuess = inputField.value.trim().toLowerCase();
-            const correctWord = word.toLowerCase();
-            
-            if (userGuess === correctWord) {
-                inputField.className = 'word-input correct';
-                score++;
+            const input = document.getElementById(`guess-${index}`);
+            if (input.value.trim().toLowerCase() === word.toLowerCase()) {
+                input.className = 'word-input correct'; score++;
             } else {
-                inputField.className = 'word-input wrong';
-                inputField.value = `${userGuess} (Correct: ${word})`;
+                input.className = 'word-input wrong'; 
+                input.value += ` (Correct: ${word})`;
+                missedWords.push(word);
             }
         });
-        document.getElementById('score-display').innerText = `Your Final Score: ${score} / ${targetWords.length}`;
+
+        document.getElementById('score-display').innerText = `Score: ${score}/${targetWords.length}`;
+        if (missedWords.length > 0) {
+            document.getElementById('review-btn').classList.remove('hidden');
+        }
+    }
+
+    function startReview() {
+        startGame(missedWords.join(','));
     }
 
     function resetGame() {
+        clearInterval(timerInterval);
         document.getElementById('setup-section').classList.remove('hidden');
         document.getElementById('game-section').classList.add('hidden');
-        document.getElementById('score-display').innerText = '';
     }
 </script>
 
