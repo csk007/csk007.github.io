@@ -19,12 +19,16 @@
         .btn-finish { background: #1a73e8; color: white; margin-top: 20px; }
         button:hover { opacity: 0.9; }
         .hidden { display: none; }
+        
+        /* Serial Number Styling */
         .word-row { display: flex; align-items: center; margin-bottom: 15px; gap: 12px; }
+        .serial-number { font-weight: bold; min-width: 25px; color: #5f6368; }
+        
         .word-input { padding: 10px; border: 2px solid #ccc; border-radius: 6px; flex-grow: 1; font-size: 16px; }
         .correct { border-color: #34a853 !important; background-color: #e6f4ea; }
         .wrong { border-color: #d93025 !important; background-color: #fce8e6; }
         #score-display { font-weight: bold; font-size: 1.3em; text-align: center; margin-top: 20px; }
-        .btn-play { background: #f8f9fa; border: 1px solid #dadce0; color: #3c4043; max-width: 80px; }
+        .btn-play { background: #f8f9fa; border: 1px solid #dadce0; color: #3c4043; min-width: 50px; }
         .saved-section { border-top: 1px solid #eee; margin-top: 20px; padding-top: 20px; }
     </style>
 </head>
@@ -36,12 +40,12 @@
     <div id="setup-section">
         <div class="form-group">
             <label>List Title (optional):</label>
-            <input type="text" id="list-title" placeholder="e.g., Week 1 Science Words">
+            <input type="text" id="list-title" placeholder="e.g., Science Vocabulary">
         </div>
         
         <div class="form-group">
             <label>Words (separated by spaces or commas):</label>
-            <textarea id="word-input-area" placeholder="apple banana cherry..."></textarea>
+            <textarea id="word-input-area" placeholder="galaxy atom molecule..."></textarea>
         </div>
 
         <div class="controls">
@@ -89,13 +93,12 @@
         savedData.push(newList);
         localStorage.setItem('spellingGameData', JSON.stringify(savedData));
         updateDropdown();
-        alert("List saved successfully!");
+        alert("List saved!");
     }
 
     function updateDropdown() {
         const dropdown = document.getElementById('saved-lists-dropdown');
         dropdown.innerHTML = '<option value="">-- Select a saved list --</option>';
-        
         savedData.forEach(item => {
             const option = document.createElement('option');
             option.value = item.id;
@@ -115,10 +118,10 @@
 
     function startGame() {
         const input = document.getElementById('word-input-area').value;
-        if (!input.trim()) return alert("Enter words or select a saved list.");
+        if (!input.trim()) return alert("Please enter or select words.");
 
         targetWords = input.split(/[ ,]+/).filter(word => word.length > 0);
-        document.getElementById('current-game-title').innerText = document.getElementById('list-title').value || "New Game";
+        document.getElementById('current-game-title').innerText = document.getElementById('list-title').value || "Spelling Test";
         
         document.getElementById('setup-section').classList.add('hidden');
         document.getElementById('game-section').classList.remove('hidden');
@@ -132,8 +135,9 @@
             const row = document.createElement('div');
             row.className = 'word-row';
             row.innerHTML = `
+                <span class="serial-number">${index + 1}.</span>
                 <button class="btn-play" onclick="speakWord('${word}')">🔊</button>
-                <input type="text" class="word-input" id="guess-${index}" autocomplete="off" placeholder="Type word...">
+                <input type="text" class="word-input" id="guess-${index}" autocomplete="off" placeholder="Type here...">
             `;
             container.appendChild(row);
         });
@@ -148,15 +152,18 @@
         let score = 0;
         targetWords.forEach((word, index) => {
             const inputField = document.getElementById(`guess-${index}`);
-            if (inputField.value.trim().toLowerCase() === word.toLowerCase()) {
+            const userGuess = inputField.value.trim().toLowerCase();
+            const correctWord = word.toLowerCase();
+            
+            if (userGuess === correctWord) {
                 inputField.className = 'word-input correct';
                 score++;
             } else {
                 inputField.className = 'word-input wrong';
-                inputField.value += ` (Correct: ${word})`;
+                inputField.value = `${userGuess} (Correct: ${word})`;
             }
         });
-        document.getElementById('score-display').innerText = `Score: ${score} / ${targetWords.length}`;
+        document.getElementById('score-display').innerText = `Your Final Score: ${score} / ${targetWords.length}`;
     }
 
     function resetGame() {
@@ -167,5 +174,4 @@
 </script>
 
 </body>
-    </html>
-    
+</html>
