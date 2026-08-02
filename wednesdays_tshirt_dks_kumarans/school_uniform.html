@@ -1,0 +1,2376 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>School Uniform Planner | Kumarans DKS</title>
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap"
+    rel="stylesheet">
+  <!-- FontAwesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    /* Premium CSS Theme Variables */
+    :root {
+      --primary: #1e3a8a;
+      /* Deep Navy */
+      --primary-light: #3b82f6;
+      /* Blue Accent */
+      --primary-bg: #eff6ff;
+      /* Light Navy Tint */
+      --secondary: #d97706;
+      /* School Amber/Gold */
+      --secondary-bg: #fef3c7;
+      /* Light Amber Tint */
+      --dark: #0f172a;
+      /* Slate Dark */
+      --gray: #475569;
+      /* Slate Gray */
+      --light-gray: #f8fafc;
+      /* Background Gray */
+      --white: #ffffff;
+      --border: #e2e8f0;
+
+      --gradient-primary: linear-gradient(135deg, #1e3b8b 0%, #3b82f6 100%);
+      --gradient-amber: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+      --gradient-card-boys: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      --gradient-card-girls: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%);
+
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+
+      --radius-sm: 0.375rem;
+      --radius-md: 0.5rem;
+      --radius-lg: 0.75rem;
+      --radius-xl: 1rem;
+
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Global Reset & Base Styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--light-gray);
+      color: var(--dark);
+      line-height: 1.6;
+      padding-bottom: 3rem;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+    }
+
+    a {
+      color: var(--primary-light);
+      text-decoration: none;
+      transition: var(--transition);
+    }
+
+    a:hover {
+      color: var(--primary);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    /* Header Section */
+    header {
+      background: var(--gradient-primary);
+      color: var(--white);
+      padding: 3rem 0;
+      border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+      margin-bottom: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 400px;
+      height: 400px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .header-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .badge-gold {
+      background-color: var(--secondary);
+      color: var(--white);
+    }
+
+    .header-title-container {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .header-title-container i {
+      font-size: 2.25rem;
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      letter-spacing: -0.02em;
+    }
+
+    .header-subtitle {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Greeting & Live Summary Bar */
+    .live-status-bar {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: var(--radius-lg);
+      padding: 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .live-greeting {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-weight: 500;
+    }
+
+    .live-greeting i {
+      color: var(--secondary);
+      animation: pulse 2s infinite;
+    }
+
+    .live-summary {
+      font-weight: 600;
+      background: var(--white);
+      color: var(--primary);
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-md);
+      font-size: 0.9rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Quick Links Navigation */
+    .quick-links {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+      scrollbar-width: none;
+      /* Hide scrollbar for clean look */
+    }
+
+    .quick-links::-webkit-scrollbar {
+      display: none;
+    }
+
+    .quick-link-btn {
+      background: var(--white);
+      color: var(--gray);
+      padding: 0.75rem 1.25rem;
+      border-radius: var(--radius-lg);
+      font-weight: 600;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: var(--shadow-sm);
+      white-space: nowrap;
+      border: 1px solid var(--border);
+    }
+
+    .quick-link-btn:hover {
+      color: var(--primary);
+      border-color: var(--primary-light);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Main Grid Structure */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    @media (min-width: 992px) {
+      .main-grid {
+        grid-template-columns: 2.5fr 1fr;
+      }
+    }
+
+    /* Tabs Component - Desktop View */
+    .tabs-wrapper {
+      background: var(--white);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .tabs-nav {
+      display: flex;
+      background: var(--light-gray);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tab-btn {
+      flex: 1;
+      background: none;
+      border: none;
+      padding: 1.25rem 1rem;
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--gray);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+      position: relative;
+      transition: var(--transition);
+    }
+
+    .tab-btn::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background-color: var(--primary-light);
+      transform: scaleX(0);
+      transform-origin: bottom center;
+      transition: var(--transition);
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      background-color: var(--white);
+    }
+
+    .tab-btn.active::after {
+      transform: scaleX(1);
+    }
+
+    .tab-btn .tab-sub {
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      opacity: 0.7;
+    }
+
+    .tab-btn.today-indicator::before {
+      content: 'TODAY';
+      position: absolute;
+      top: 4px;
+      font-size: 0.6rem;
+      background: var(--secondary);
+      color: var(--white);
+      padding: 1px 6px;
+      border-radius: 9999px;
+      font-weight: 700;
+    }
+
+    /* Accordion - Mobile View fallback built directly into the structure */
+    .tabs-content {
+      padding: 2rem;
+    }
+
+    .day-panel {
+      display: none;
+    }
+
+    .day-panel.active {
+      display: block;
+      animation: fadeIn 0.4s ease;
+    }
+
+    /* Mobile Accordion Header - Hidden on Desktop */
+    .accordion-header {
+      display: none;
+      width: 100%;
+      background: var(--light-gray);
+      border: 1px solid var(--border);
+      padding: 1.25rem;
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary);
+      text-align: left;
+      cursor: pointer;
+      align-items: center;
+      justify-content: space-between;
+      border-radius: var(--radius-lg);
+      margin-bottom: 0.75rem;
+      transition: var(--transition);
+    }
+
+    .accordion-header.active {
+      background: var(--primary-bg);
+      color: var(--primary);
+      border-color: var(--primary-light);
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+      margin-bottom: 0;
+    }
+
+    .accordion-header i {
+      transition: var(--transition);
+    }
+
+    .accordion-header.active i {
+      transform: rotate(180deg);
+    }
+
+    .accordion-content {
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+      padding: 1.5rem;
+      background: var(--white);
+      margin-bottom: 0.75rem;
+      animation: slideDown 0.3s ease-out;
+    }
+
+    /* Class Level Filter Pills */
+    .class-filter-container {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+      background: var(--light-gray);
+      padding: 0.35rem;
+      border-radius: 9999px;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+      border: 1px solid var(--border);
+    }
+
+    .class-pill {
+      flex: 1;
+      background: none;
+      border: none;
+      padding: 0.6rem 1rem;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--gray);
+      cursor: pointer;
+      border-radius: 9999px;
+      transition: var(--transition);
+      text-align: center;
+    }
+
+    .class-pill.active {
+      background: var(--primary);
+      color: var(--white);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Uniform Attire Cards Grid */
+    .class-uniform-section {
+      display: none;
+    }
+
+    .class-uniform-section.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .attire-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (min-width: 768px) {
+      .attire-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .attire-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      transition: var(--transition);
+    }
+
+    .attire-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .attire-card-boys {
+      border-left: 6px solid var(--primary-light);
+    }
+
+    .attire-card-girls {
+      border-left: 6px solid #ec4899;
+      /* Pink Accent */
+    }
+
+    .card-gender-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.75rem;
+    }
+
+    .gender-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .attire-card-boys .gender-title {
+      color: var(--primary);
+    }
+
+    .attire-card-girls .gender-title {
+      color: #db2777;
+    }
+
+    .gender-badge {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+    }
+
+    .attire-card-boys .gender-badge {
+      background: var(--primary-bg);
+      color: var(--primary);
+    }
+
+    .attire-card-girls .gender-badge {
+      background: #fdf2f8;
+      color: #db2777;
+    }
+
+    .uniform-details-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      flex-grow: 1;
+    }
+
+    .uniform-item {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .uniform-item i {
+      font-size: 1.1rem;
+      margin-top: 0.25rem;
+      width: 20px;
+      text-align: center;
+    }
+
+    .attire-card-boys .uniform-item i {
+      color: var(--primary-light);
+    }
+
+    .attire-card-girls .uniform-item i {
+      color: #ec4899;
+    }
+
+    .item-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: var(--gray);
+      margin-bottom: 0.15rem;
+    }
+
+    .item-desc {
+      font-size: 0.95rem;
+      color: var(--dark);
+      font-weight: 500;
+    }
+
+    /* Wednesday Special Panel styles */
+    .wednesday-dynamic-banner {
+      background: var(--gradient-amber);
+      color: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow-md);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .wednesday-dynamic-banner h3 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .wednesday-dynamic-banner p {
+      font-size: 1rem;
+      opacity: 0.95;
+      margin-bottom: 1rem;
+    }
+
+    .tshirt-preview-box {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+
+    .tshirt-preview-img {
+      width: 70px;
+      height: 70px;
+      object-fit: contain;
+      background: var(--white);
+      border-radius: var(--radius-md);
+      padding: 0.25rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .tshirt-preview-info {
+      flex-grow: 1;
+    }
+
+    .tshirt-preview-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+
+    .tshirt-preview-subtitle {
+      font-size: 0.85rem;
+      opacity: 0.9;
+    }
+
+    /* Wednesday Selector Simulation Panel */
+    .wednesday-selector-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      padding: 1.25rem;
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .wednesday-selector-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--gray);
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .wednesday-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 0.5rem;
+    }
+
+    .wednesday-opt-btn {
+      background: var(--light-gray);
+      border: 1px solid var(--border);
+      padding: 0.75rem 0.5rem;
+      border-radius: var(--radius-md);
+      text-align: center;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--dark);
+      transition: var(--transition);
+    }
+
+    .wednesday-opt-btn:hover {
+      border-color: var(--primary-light);
+      background: var(--white);
+    }
+
+    .wednesday-opt-btn.active {
+      background: var(--primary-bg);
+      border-color: var(--primary-light);
+      color: var(--primary);
+      font-weight: 700;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .wednesday-opt-btn .opt-tshirt {
+      font-size: 0.75rem;
+      display: block;
+      margin-top: 0.25rem;
+      font-weight: 500;
+    }
+
+    .wednesday-opt-btn.active .opt-tshirt {
+      color: var(--secondary);
+    }
+
+    /* Sidebar / Right Column Widgets */
+    .widget-card {
+      background: var(--white);
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--border);
+      padding: 1.75rem;
+      box-shadow: var(--shadow-md);
+      margin-bottom: 2rem;
+    }
+
+    .widget-title {
+      font-size: 1.25rem;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--primary);
+      border-bottom: 2px solid var(--primary-bg);
+      padding-bottom: 0.5rem;
+    }
+
+    /* Policy Rules list */
+    .policy-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      list-style: none;
+    }
+
+    .policy-item {
+      display: flex;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px dashed var(--border);
+    }
+
+    .policy-item:last-child {
+      border-bottom: none;
+    }
+
+    .policy-item i {
+      color: var(--primary-light);
+      margin-top: 0.15rem;
+    }
+
+    /* Vendors styling */
+    .vendor-card {
+      background: var(--light-gray);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border: 1px solid var(--border);
+    }
+
+    .vendor-card:last-child {
+      margin-bottom: 1.5rem;
+    }
+
+    .vendor-name {
+      font-weight: 700;
+      color: var(--dark);
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .vendor-name i {
+      color: var(--secondary);
+    }
+
+    .vendor-items {
+      font-size: 0.85rem;
+      color: var(--gray);
+      margin-top: 0.25rem;
+    }
+
+    .btn-edchemy {
+      display: block;
+      width: 100%;
+      text-align: center;
+      background: var(--gradient-primary);
+      color: var(--white);
+      padding: 0.85rem;
+      border-radius: var(--radius-md);
+      font-weight: 700;
+      font-size: 0.95rem;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-edchemy:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      color: var(--white);
+    }
+
+    /* Visual Accessories Gallery */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    @media (min-width: 768px) {
+      .gallery-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    @media (min-width: 992px) {
+      .gallery-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .gallery-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+    }
+
+    .gallery-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .gallery-img-wrapper {
+      position: relative;
+      padding-top: 100%;
+      /* 1:1 Aspect Ratio */
+      background: var(--light-gray);
+    }
+
+    .gallery-img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: var(--transition);
+    }
+
+    .gallery-info {
+      padding: 0.75rem;
+      text-align: center;
+      background: var(--white);
+      border-top: 1px solid var(--border);
+    }
+
+    .gallery-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--dark);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .gallery-category {
+      font-size: 0.7rem;
+      color: var(--gray);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 0.1rem;
+    }
+
+    /* Footer */
+    footer {
+      background: var(--dark);
+      color: var(--white);
+      padding: 2.5rem 0;
+      margin-top: 4rem;
+      border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    footer a {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    footer a:hover {
+      color: var(--white);
+    }
+
+    .footer-divider {
+      border: 0;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.1);
+      margin: 1.5rem 0;
+    }
+
+    .footer-contacts {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+      margin-top: 0.5rem;
+    }
+
+    .footer-contact-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideDown {
+      from {
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
+      }
+
+      to {
+        max-height: 1000px;
+        opacity: 1;
+      }
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+
+      50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+      }
+    }
+
+    /* Responsive Styles */
+    @media (max-width: 767px) {
+      .tabs-nav {
+        display: none;
+        /* Hide desktop tabs */
+      }
+
+      .tabs-wrapper {
+        box-shadow: none;
+        border: none;
+        background: transparent;
+      }
+
+      .tabs-content {
+        padding: 0;
+      }
+
+      .accordion-header {
+        display: flex;
+        /* Show accordion headers */
+      }
+
+      .day-panel {
+        display: none;
+      }
+
+      .day-panel.active {
+        display: block;
+        /* Show the active accordion content */
+      }
+
+      header h1 {
+        font-size: 2rem;
+      }
+
+      header {
+        padding: 2rem 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Premium Header & Greetings -->
+  <header>
+    <div class="container header-content">
+      <div class="header-title-container">
+        <i class="fa-solid fa-shirt"></i>
+        <h1>Kumarans</h1>
+      </div>
+      <div class="header-subtitle">School Uniform Planner & Attire Guide</div>
+
+      <!-- Greeting and Live Status Bar -->
+      <div class="live-status-bar">
+        <div class="live-greeting">
+          <i class="fa-solid fa-bell"></i>
+          <span id="greeting-text">Hello, Kumaranites!</span>
+        </div>
+        <div class="live-summary" id="live-uniform-summary">
+          Loading today's dress code...
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <!-- Quick Access Section links -->
+    <div class="quick-links">
+      <a href="#planner-section" class="quick-link-btn"><i class="fa-solid fa-calendar-days"></i> Daily Schedule</a>
+      <a href="#accessories-section" class="quick-link-btn"><i class="fa-solid fa-icons"></i> Accessories Gallery</a>
+      <a href="#policy-section" class="quick-link-btn"><i class="fa-solid fa-scale-balanced"></i> Dress Code
+        Policies</a>
+      <a href="#vendors-section" class="quick-link-btn"><i class="fa-solid fa-store"></i> School Vendors</a>
+      <a href="unisex_belt.pdf" target="_blank" class="quick-link-btn"><i class="fa-solid fa-file-pdf"></i> Uniform Belt
+        (PDF)</a>
+      <a href="unisex_tie.pdf" target="_blank" class="quick-link-btn"><i class="fa-solid fa-file-pdf"></i> Uniform Tie
+        (PDF)</a>
+    </div>
+
+    <!-- Main Content Area Grid -->
+    <div class="main-grid">
+
+      <!-- Left Column: Tabs/Accordion Daily Planner -->
+      <section id="planner-section">
+
+        <!-- Tabs Shell -->
+        <div class="tabs-wrapper">
+
+          <!-- Desktop Tabs Buttons -->
+          <nav class="tabs-nav">
+            <button class="tab-btn active" onclick="switchDay('monday')" id="tab-monday">
+              <span>Monday</span>
+              <span class="tab-sub">Regular</span>
+            </button>
+            <button class="tab-btn" onclick="switchDay('tuesday')" id="tab-tuesday">
+              <span>Tuesday</span>
+              <span class="tab-sub">Regular</span>
+            </button>
+            <button class="tab-btn" onclick="switchDay('wednesday')" id="tab-wednesday">
+              <span>Wednesday</span>
+              <span class="tab-sub" id="tab-wed-sub">Dynamic</span>
+            </button>
+            <button class="tab-btn" onclick="switchDay('thursday')" id="tab-thursday">
+              <span>Thursday</span>
+              <span class="tab-sub">Regular</span>
+            </button>
+            <button class="tab-btn" onclick="switchDay('friday')" id="tab-friday">
+              <span>Friday</span>
+              <span class="tab-sub">Regular</span>
+            </button>
+            <button class="tab-btn" onclick="switchDay('saturday')" id="tab-saturday">
+              <span>Saturday</span>
+              <span class="tab-sub">PTM / Event</span>
+            </button>
+          </nav>
+
+          <!-- Day details content -->
+          <div class="tabs-content">
+
+            <!-- CLASS LEVEL FILTER PILLS -->
+            <div class="class-filter-container">
+              <button class="class-pill active" onclick="switchClass('classes-1-3')" id="pill-classes-1-3">Classes I -
+                III</button>
+              <button class="class-pill" onclick="switchClass('classes-4-7')" id="pill-classes-4-7">Classes IV -
+                VII</button>
+              <button class="class-pill" onclick="switchClass('classes-8-11')" id="pill-classes-8-11">Classes VIII -
+                XI</button>
+            </div>
+
+            <!-- ==============================================
+                 MONDAY PANEL
+                 ============================================== -->
+            <button class="accordion-header active" onclick="toggleAccordion('monday')" id="acc-monday">
+              <span><i class="fa-solid fa-calendar-day"></i> Monday (Regular Uniform)</span>
+              <i class="fa-solid fa-chevron-down"></i>
+            </button>
+            <div class="day-panel active accordion-content" id="panel-monday">
+
+              <!-- Classes I to III -->
+              <div class="class-uniform-section active" id="monday-classes-1-3">
+                <div class="attire-grid">
+                  <!-- Boys Card -->
+                  <div class="attire-card attire-card-boys">
+                    <div class="card-gender-header">
+                      <div class="gender-title"><i class="fa-solid fa-user-astronaut"></i> Boys</div>
+                      <span class="gender-badge">Classes I - III</span>
+                    </div>
+                    <ul class="uniform-details-list">
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-shirt"></i>
+                        <div>
+                          <div class="item-label">Uniform</div>
+                          <div class="item-desc">Light Blue Shirt & Navy Blue Plaid Shorts</div>
+                        </div>
+                      </li>
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-socks"></i>
+                        <div>
+                          <div class="item-label">Accessories</div>
+                          <div class="item-desc">Light Blue mélange socks, Sweat shirts & Belt</div>
+                        </div>
+                      </li>
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-shoe-prints"></i>
+                        <div>
+                          <div class="item-label">Footwear</div>
+                          <div class="item-desc">Black School Shoes (prescribed)</div>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                  <!-- Girls Card -->
+                  <div class="attire-card attire-card-girls">
+                    <div class="card-gender-header">
+                      <div class="gender-title"><i class="fa-solid fa-user-ninja"></i> Girls</div>
+                      <span class="gender-badge">Classes I - III</span>
+                    </div>
+                    <ul class="uniform-details-list">
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-person-dress"></i>
+                        <div>
+                          <div class="item-label">Uniform</div>
+                          <div class="item-desc">Light Blue Shirt & Navy Blue Plaid Pinafore</div>
+                        </div>
+                      </li>
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-socks"></i>
+                        <div>
+                          <div class="item-label">Accessories</div>
+                          <div class="item-desc">Light Blue mélange socks, Sweat shirts, Blue tights & slips</div>
+                        </div>
+                      </li>
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-shoe-prints"></i>
+                        <div>
+                          <div class="item-label">Footwear</div>
+                          <div class="item-desc">Black School Shoes (prescribed)</div>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Classes IV to VII -->
+              <div class="class-uniform-section" id="monday-classes-4-7">
+                <div class="attire-grid">
+                  <!-- Boys Card -->
+                  <div class="attire-card attire-card-boys">
+                    <div class="card-gender-header">
+                      <div class="gender-title"><i class="fa-solid fa-user-astronaut"></i> Boys</div>
+                      <span class="gender-badge">Classes IV - VII</span>
+                    </div>
+                    <ul class="uniform-details-list">
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-shirt"></i>
+                        <div>
+                          <div class="item-label">Uniform</div>
+                          <div class="item-desc">Light Blue Shirt & Navy Blue Plaid Shorts</div>
+                        </div>
+                      </li>
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-socks"></i>
+                        <div>
+                          <div class="item-label">Accessories</div>
+                          <div class="item-desc">Light Blue mélange socks, Sweat shirts, Tie & Belt</div>
+                        </div>
+                      </li>
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-shoe-prints"></i>
+                        <div>
+                          <div class="item-label">Footwear</div>
+                          <div class="item-desc">Black School Shoes</div>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                  <!-- Girls Card -->
+                  <div class="attire-card attire-card-girls">
+                    <div class="card-gender-header">
+                      <div class="gender-title"><i class="fa-solid fa-user-ninja"></i> Girls</div>
+                      <span class="gender-badge">Classes IV - VII</span>
+                    </div>
+                    <ul class="uniform-details-list">
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-person-dress"></i>
+                        <div>
+                          <div class="item-label">Uniform</div>
+                          <div class="item-desc">Light Blue Shirt & Navy Blue Plaid Pinafore</div>
+                        </div>
+                      </li>
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-socks"></i>
+                        <div>
+                          <div class="item-label">Accessories</div>
+                          <div class="item-desc">Light Blue mélange socks, Sweat shirts, Tie, Belt, Blue tights & slips
+                          </div>
+                        </div>
+                      </li>
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-shoe-prints"></i>
+                        <div>
+                          <div class="item-label">Footwear</div>
+                          <div class="item-desc">Black School Shoes</div>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Classes VIII to XI -->
+              <div class="class-uniform-section" id="monday-classes-8-11">
+                <div class="attire-grid">
+                  <!-- Boys Card -->
+                  <div class="attire-card attire-card-boys">
+                    <div class="card-gender-header">
+                      <div class="gender-title"><i class="fa-solid fa-user-astronaut"></i> Boys</div>
+                      <span class="gender-badge">Classes VIII - XI</span>
+                    </div>
+                    <ul class="uniform-details-list">
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-shirt"></i>
+                        <div>
+                          <div class="item-label">Uniform</div>
+                          <div class="item-desc">Light Blue Shirt & Navy Blue Plain Trousers</div>
+                        </div>
+                      </li>
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-socks"></i>
+                        <div>
+                          <div class="item-label">Accessories</div>
+                          <div class="item-desc">Light Blue mélange socks, Sweat shirts, Tie & Belt</div>
+                        </div>
+                      </li>
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-shoe-prints"></i>
+                        <div>
+                          <div class="item-label">Footwear</div>
+                          <div class="item-desc">Black School Shoes</div>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                  <!-- Girls Card -->
+                  <div class="attire-card attire-card-girls">
+                    <div class="card-gender-header">
+                      <div class="gender-title"><i class="fa-solid fa-user-ninja"></i> Girls</div>
+                      <span class="gender-badge">Classes VIII - XI</span>
+                    </div>
+                    <ul class="uniform-details-list">
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-person-dress"></i>
+                        <div>
+                          <div class="item-label">Uniform</div>
+                          <div class="item-desc">Light Blue Shirt & Navy Blue Plaid Skirt</div>
+                        </div>
+                      </li>
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-socks"></i>
+                        <div>
+                          <div class="item-label">Accessories</div>
+                          <div class="item-desc">Light Blue mélange socks, Sweat shirts, Tie, Belt, Blue tights & slips
+                          </div>
+                        </div>
+                      </li>
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-shoe-prints"></i>
+                        <div>
+                          <div class="item-label">Footwear</div>
+                          <div class="item-desc">Black School Shoes</div>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+
+            <!-- ==============================================
+                 TUESDAY PANEL (Same as Monday)
+                 ============================================== -->
+            <button class="accordion-header" onclick="toggleAccordion('tuesday')" id="acc-tuesday">
+              <span><i class="fa-solid fa-calendar-day"></i> Tuesday (Regular Uniform)</span>
+              <i class="fa-solid fa-chevron-down"></i>
+            </button>
+            <div class="day-panel accordion-content" id="panel-tuesday">
+
+              <!-- Content replicates Monday for display -->
+              <div class="class-uniform-section active" id="tuesday-classes-1-3"></div>
+              <div class="class-uniform-section" id="tuesday-classes-4-7"></div>
+              <div class="class-uniform-section" id="tuesday-classes-8-11"></div>
+
+            </div>
+
+
+            <!-- ==============================================
+                 WEDNESDAY PANEL (DYNAMIC)
+                 ============================================== -->
+            <button class="accordion-header" onclick="toggleAccordion('wednesday')" id="acc-wednesday">
+              <span><i class="fa-solid fa-calendar-day"></i> Wednesday (Sports Uniform)</span>
+              <i class="fa-solid fa-chevron-down"></i>
+            </button>
+            <div class="day-panel accordion-content" id="panel-wednesday">
+
+              <!-- Wednesday Dynamic Announcement Banner -->
+              <div class="wednesday-dynamic-banner">
+                <h3 id="wed-banner-title">Wednesday Attire: House T-Shirt</h3>
+                <p id="wed-banner-desc">Calculated for the current or upcoming Wednesday: <strong>August 5,
+                    2026</strong> (1st Wednesday of the month).</p>
+
+                <div class="tshirt-preview-box">
+                  <img
+                    src="https://5.imimg.com/data5/SELLER/Default/2023/4/300100634/AT/DI/XH/90786645/ganga-house-t-shirt-500x500.png"
+                    class="tshirt-preview-img" alt="House T-Shirt" id="wed-banner-img">
+                  <div class="tshirt-preview-info">
+                    <div class="tshirt-preview-title" id="wed-active-title">House T-Shirt & Steel Grey Pants/Skirt</div>
+                    <div class="tshirt-preview-subtitle" id="wed-active-desc">Required for I & III Wednesdays of the
+                      month.</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Interactive Wednesday Preview Selector -->
+              <div class="wednesday-selector-card">
+                <div class="wednesday-selector-title">
+                  <i class="fa-solid fa-wand-magic-sparkles"></i> Preview Wednesdays of <span
+                    id="current-month-name">this month</span>
+                </div>
+                <div class="wednesday-grid" id="wednesdays-of-month-list">
+                  <!-- JS will dynamically populate buttons representing each Wednesday of the current month -->
+                </div>
+              </div>
+
+              <!-- Dynamic Wed Classes Details -->
+              <!-- Classes I to III -->
+              <div class="class-uniform-section active" id="wednesday-classes-1-3">
+                <div class="attire-grid">
+                  <!-- Boys Card -->
+                  <div class="attire-card attire-card-boys">
+                    <div class="card-gender-header">
+                      <div class="gender-title"><i class="fa-solid fa-user-astronaut"></i> Boys</div>
+                      <span class="gender-badge">Classes I - III</span>
+                    </div>
+                    <ul class="uniform-details-list">
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-shirt"></i>
+                        <div>
+                          <div class="item-label">Uniform</div>
+                          <div class="item-desc"><span class="dynamic-tshirt-text">House T-Shirt</span> & Steel Grey
+                            Plain Shorts</div>
+                        </div>
+                      </li>
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-socks"></i>
+                        <div>
+                          <div class="item-label">Accessories</div>
+                          <div class="item-desc">White socks with green and blue stripes & Belt</div>
+                        </div>
+                      </li>
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-shoe-prints"></i>
+                        <div>
+                          <div class="item-label">Footwear</div>
+                          <div class="item-desc">White Sports Shoes / Sneakers</div>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                  <!-- Girls Card -->
+                  <div class="attire-card attire-card-girls">
+                    <div class="card-gender-header">
+                      <div class="gender-title"><i class="fa-solid fa-user-ninja"></i> Girls</div>
+                      <span class="gender-badge">Classes I - III</span>
+                    </div>
+                    <ul class="uniform-details-list">
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-person-dress"></i>
+                        <div>
+                          <div class="item-label">Uniform</div>
+                          <div class="item-desc"><span class="dynamic-tshirt-text">House T-Shirt</span> & Green-Blue
+                            Checked Skirt</div>
+                        </div>
+                      </li>
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-socks"></i>
+                        <div>
+                          <div class="item-label">Accessories</div>
+                          <div class="item-desc">White socks with green and Blue stripes, Belt, Blue tights & slips
+                          </div>
+                        </div>
+                      </li>
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-shoe-prints"></i>
+                        <div>
+                          <div class="item-label">Footwear</div>
+                          <div class="item-desc">White Sports Shoes / Sneakers</div>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Classes IV to VII -->
+              <div class="class-uniform-section" id="wednesday-classes-4-7">
+                <div class="attire-grid">
+                  <!-- Boys Card -->
+                  <div class="attire-card attire-card-boys">
+                    <div class="card-gender-header">
+                      <div class="gender-title"><i class="fa-solid fa-user-astronaut"></i> Boys</div>
+                      <span class="gender-badge">Classes IV - VII</span>
+                    </div>
+                    <ul class="uniform-details-list">
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-shirt"></i>
+                        <div>
+                          <div class="item-label">Uniform</div>
+                          <div class="item-desc"><span class="dynamic-tshirt-text">House T-Shirt</span> & Steel Grey
+                            Plain Shorts</div>
+                        </div>
+                      </li>
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-socks"></i>
+                        <div>
+                          <div class="item-label">Accessories</div>
+                          <div class="item-desc">White socks with green and blue stripes & Belt (No tie on Wednesday)
+                          </div>
+                        </div>
+                      </li>
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-shoe-prints"></i>
+                        <div>
+                          <div class="item-label">Footwear</div>
+                          <div class="item-desc">White Sports Shoes</div>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                  <!-- Girls Card -->
+                  <div class="attire-card attire-card-girls">
+                    <div class="card-gender-header">
+                      <div class="gender-title"><i class="fa-solid fa-user-ninja"></i> Girls</div>
+                      <span class="gender-badge">Classes IV - VII</span>
+                    </div>
+                    <ul class="uniform-details-list">
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-person-dress"></i>
+                        <div>
+                          <div class="item-label">Uniform</div>
+                          <div class="item-desc"><span class="dynamic-tshirt-text">House T-Shirt</span> & Green-Blue
+                            Checked Skirt</div>
+                        </div>
+                      </li>
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-socks"></i>
+                        <div>
+                          <div class="item-label">Accessories</div>
+                          <div class="item-desc">White socks with green and Blue stripes, Belt, Blue tights & slips
+                          </div>
+                        </div>
+                      </li>
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-shoe-prints"></i>
+                        <div>
+                          <div class="item-label">Footwear</div>
+                          <div class="item-desc">White Sports Shoes</div>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Classes VIII to XI -->
+              <div class="class-uniform-section" id="wednesday-classes-8-11">
+                <div class="attire-grid">
+                  <!-- Boys Card -->
+                  <div class="attire-card attire-card-boys">
+                    <div class="card-gender-header">
+                      <div class="gender-title"><i class="fa-solid fa-user-astronaut"></i> Boys</div>
+                      <span class="gender-badge">Classes VIII - XI</span>
+                    </div>
+                    <ul class="uniform-details-list">
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-shirt"></i>
+                        <div>
+                          <div class="item-label">Uniform</div>
+                          <div class="item-desc"><span class="dynamic-tshirt-text">House T-Shirt</span> & Steel Grey
+                            Plain Trousers</div>
+                        </div>
+                      </li>
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-socks"></i>
+                        <div>
+                          <div class="item-label">Accessories</div>
+                          <div class="item-desc">White socks with green and blue stripes & Belt</div>
+                        </div>
+                      </li>
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-shoe-prints"></i>
+                        <div>
+                          <div class="item-label">Footwear</div>
+                          <div class="item-desc">White Sports Shoes</div>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                  <!-- Girls Card -->
+                  <div class="attire-card attire-card-girls">
+                    <div class="card-gender-header">
+                      <div class="gender-title"><i class="fa-solid fa-user-ninja"></i> Girls</div>
+                      <span class="gender-badge">Classes VIII - XI</span>
+                    </div>
+                    <ul class="uniform-details-list">
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-person-dress"></i>
+                        <div>
+                          <div class="item-label">Uniform</div>
+                          <div class="item-desc"><span class="dynamic-tshirt-text">House T-Shirt</span> & Green-Blue
+                            Checked Skirt</div>
+                        </div>
+                      </li>
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-socks"></i>
+                        <div>
+                          <div class="item-label">Accessories</div>
+                          <div class="item-desc">White socks with green and Blue stripes, Belt, Blue tights & slips
+                          </div>
+                        </div>
+                      </li>
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-shoe-prints"></i>
+                        <div>
+                          <div class="item-label">Footwear</div>
+                          <div class="item-desc">White Sports Shoes</div>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+
+            <!-- ==============================================
+                 THURSDAY PANEL (Same as Monday)
+                 ============================================== -->
+            <button class="accordion-header" onclick="toggleAccordion('thursday')" id="acc-thursday">
+              <span><i class="fa-solid fa-calendar-day"></i> Thursday (Regular Uniform)</span>
+              <i class="fa-solid fa-chevron-down"></i>
+            </button>
+            <div class="day-panel accordion-content" id="panel-thursday">
+
+              <!-- Content replicates Monday for display -->
+              <div class="class-uniform-section active" id="thursday-classes-1-3"></div>
+              <div class="class-uniform-section" id="thursday-classes-4-7"></div>
+              <div class="class-uniform-section" id="thursday-classes-8-11"></div>
+
+            </div>
+
+
+            <!-- ==============================================
+                 FRIDAY PANEL (Same as Monday)
+                 ============================================== -->
+            <button class="accordion-header" onclick="toggleAccordion('friday')" id="acc-friday">
+              <span><i class="fa-solid fa-calendar-day"></i> Friday (Regular Uniform)</span>
+              <i class="fa-solid fa-chevron-down"></i>
+            </button>
+            <div class="day-panel accordion-content" id="panel-friday">
+
+              <!-- Content replicates Monday for display -->
+              <div class="class-uniform-section active" id="friday-classes-1-3"></div>
+              <div class="class-uniform-section" id="friday-classes-4-7"></div>
+              <div class="class-uniform-section" id="friday-classes-8-11"></div>
+
+            </div>
+
+
+            <!-- ==============================================
+                 SATURDAY PANEL
+                 ============================================== -->
+            <button class="accordion-header" onclick="toggleAccordion('saturday')" id="acc-saturday">
+              <span><i class="fa-solid fa-calendar-day"></i> Saturday (PTM / Events)</span>
+              <i class="fa-solid fa-chevron-down"></i>
+            </button>
+            <div class="day-panel accordion-content" id="panel-saturday">
+
+              <!-- Saturday Info Announcement -->
+              <div class="wednesday-dynamic-banner" style="background: var(--gradient-primary); margin-bottom: 2rem;">
+                <h3><i class="fa-solid fa-circle-info"></i> Saturday Wear Note</h3>
+                <p>Children attending school on Saturdays for PTMs (Parent Teacher Meetings) or any other events must
+                  wear the <strong>Wednesday White T-Shirt uniform</strong>.</p>
+              </div>
+
+              <!-- Static Saturday Details (Uses White T-Shirt configuration) -->
+              <!-- Classes I to III -->
+              <div class="class-uniform-section active" id="saturday-classes-1-3">
+                <div class="attire-grid">
+                  <!-- Boys Card -->
+                  <div class="attire-card attire-card-boys">
+                    <div class="card-gender-header">
+                      <div class="gender-title"><i class="fa-solid fa-user-astronaut"></i> Boys</div>
+                      <span class="gender-badge">Classes I - III</span>
+                    </div>
+                    <ul class="uniform-details-list">
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-shirt"></i>
+                        <div>
+                          <div class="item-label">Uniform</div>
+                          <div class="item-desc">White T-Shirt & Steel Grey Plain Shorts</div>
+                        </div>
+                      </li>
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-socks"></i>
+                        <div>
+                          <div class="item-label">Accessories</div>
+                          <div class="item-desc">White socks with green and blue stripes & Belt</div>
+                        </div>
+                      </li>
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-shoe-prints"></i>
+                        <div>
+                          <div class="item-label">Footwear</div>
+                          <div class="item-desc">White Sports Shoes / Sneakers</div>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                  <!-- Girls Card -->
+                  <div class="attire-card attire-card-girls">
+                    <div class="card-gender-header">
+                      <div class="gender-title"><i class="fa-solid fa-user-ninja"></i> Girls</div>
+                      <span class="gender-badge">Classes I - III</span>
+                    </div>
+                    <ul class="uniform-details-list">
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-person-dress"></i>
+                        <div>
+                          <div class="item-label">Uniform</div>
+                          <div class="item-desc">White T-Shirt & Green-Blue Checked Skirt</div>
+                        </div>
+                      </li>
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-socks"></i>
+                        <div>
+                          <div class="item-label">Accessories</div>
+                          <div class="item-desc">White socks with green and Blue stripes, Belt, Blue tights & slips
+                          </div>
+                        </div>
+                      </li>
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-shoe-prints"></i>
+                        <div>
+                          <div class="item-label">Footwear</div>
+                          <div class="item-desc">White Sports Shoes / Sneakers</div>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Classes IV to VII -->
+              <div class="class-uniform-section" id="saturday-classes-4-7">
+                <div class="attire-grid">
+                  <!-- Boys Card -->
+                  <div class="attire-card attire-card-boys">
+                    <div class="card-gender-header">
+                      <div class="gender-title"><i class="fa-solid fa-user-astronaut"></i> Boys</div>
+                      <span class="gender-badge">Classes IV - VII</span>
+                    </div>
+                    <ul class="uniform-details-list">
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-shirt"></i>
+                        <div>
+                          <div class="item-label">Uniform</div>
+                          <div class="item-desc">White T-Shirt & Steel Grey Plain Shorts</div>
+                        </div>
+                      </li>
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-socks"></i>
+                        <div>
+                          <div class="item-label">Accessories</div>
+                          <div class="item-desc">White socks with green and blue stripes & Belt (No tie)</div>
+                        </div>
+                      </li>
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-shoe-prints"></i>
+                        <div>
+                          <div class="item-label">Footwear</div>
+                          <div class="item-desc">White Sports Shoes</div>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                  <!-- Girls Card -->
+                  <div class="attire-card attire-card-girls">
+                    <div class="card-gender-header">
+                      <div class="gender-title"><i class="fa-solid fa-user-ninja"></i> Girls</div>
+                      <span class="gender-badge">Classes IV - VII</span>
+                    </div>
+                    <ul class="uniform-details-list">
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-person-dress"></i>
+                        <div>
+                          <div class="item-label">Uniform</div>
+                          <div class="item-desc">White T-Shirt & Green-Blue Checked Skirt</div>
+                        </div>
+                      </li>
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-socks"></i>
+                        <div>
+                          <div class="item-label">Accessories</div>
+                          <div class="item-desc">White socks with green and Blue stripes, Belt, Blue tights & slips
+                          </div>
+                        </div>
+                      </li>
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-shoe-prints"></i>
+                        <div>
+                          <div class="item-label">Footwear</div>
+                          <div class="item-desc">White Sports Shoes</div>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Classes VIII to XI -->
+              <div class="class-uniform-section" id="saturday-classes-8-11">
+                <div class="attire-grid">
+                  <!-- Boys Card -->
+                  <div class="attire-card attire-card-boys">
+                    <div class="card-gender-header">
+                      <div class="gender-title"><i class="fa-solid fa-user-astronaut"></i> Boys</div>
+                      <span class="gender-badge">Classes VIII - XI</span>
+                    </div>
+                    <ul class="uniform-details-list">
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-shirt"></i>
+                        <div>
+                          <div class="item-label">Uniform</div>
+                          <div class="item-desc">White T-Shirt & Steel Grey Plain Trousers</div>
+                        </div>
+                      </li>
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-socks"></i>
+                        <div>
+                          <div class="item-label">Accessories</div>
+                          <div class="item-desc">White socks with green and blue stripes & Belt</div>
+                        </div>
+                      </li>
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-shoe-prints"></i>
+                        <div>
+                          <div class="item-label">Footwear</div>
+                          <div class="item-desc">White Sports Shoes</div>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                  <!-- Girls Card -->
+                  <div class="attire-card attire-card-girls">
+                    <div class="card-gender-header">
+                      <div class="gender-title"><i class="fa-solid fa-user-ninja"></i> Girls</div>
+                      <span class="gender-badge">Classes VIII - XI</span>
+                    </div>
+                    <ul class="uniform-details-list">
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-person-dress"></i>
+                        <div>
+                          <div class="item-label">Uniform</div>
+                          <div class="item-desc">White T-Shirt & Green-Blue Checked Skirt</div>
+                        </div>
+                      </li>
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-socks"></i>
+                        <div>
+                          <div class="item-label">Accessories</div>
+                          <div class="item-desc">White socks with green and Blue stripes, Belt, Blue tights & slips
+                          </div>
+                        </div>
+                      </li>
+                      <li class="uniform-item">
+                        <i class="fa-solid fa-shoe-prints"></i>
+                        <div>
+                          <div class="item-label">Footwear</div>
+                          <div class="item-desc">White Sports Shoes</div>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Local Accessories Visual Gallery (Integrated Assets) -->
+        <div class="widget-card" style="margin-top: 2rem;" id="accessories-section">
+          <div class="widget-title">
+            <i class="fa-solid fa-icons"></i> Interactive Accessories & Gear Gallery
+          </div>
+          <p style="font-size: 0.9rem; color: var(--gray); margin-bottom: 1.5rem;">
+            Click on items below to view details. Items are sourced directly from the school catalog.
+          </p>
+          <div class="gallery-grid">
+
+            <div class="gallery-card">
+              <div class="gallery-img-wrapper">
+                <img src="Blue_Melange_Socks.jpg" class="gallery-img" alt="Blue Melange Socks">
+              </div>
+              <div class="gallery-info">
+                <div class="gallery-title">Blue Melange Socks</div>
+                <div class="gallery-category">Regular Days</div>
+              </div>
+            </div>
+
+            <div class="gallery-card">
+              <div class="gallery-img-wrapper">
+                <img src="White_Semi_Crew_Socks.jpg" class="gallery-img" alt="White Striped Socks">
+              </div>
+              <div class="gallery-info">
+                <div class="gallery-title">White Striped Socks</div>
+                <div class="gallery-category">Wednesday / Sports</div>
+              </div>
+            </div>
+
+            <div class="gallery-card">
+              <div class="gallery-img-wrapper">
+                <img src="sweater_sleeveless.jpg" class="gallery-img" alt="Sleeveless Sweater">
+              </div>
+              <div class="gallery-info">
+                <div class="gallery-title">Sleeveless Sweater</div>
+                <div class="gallery-category">Winter wear</div>
+              </div>
+            </div>
+
+            <div class="gallery-card">
+              <div class="gallery-img-wrapper">
+                <img src="sweater_full_sleeve.jpg" class="gallery-img" alt="Full-Sleeve Sweater">
+              </div>
+              <div class="gallery-info">
+                <div class="gallery-title">Full-Sleeve Sweater</div>
+                <div class="gallery-category">Winter wear</div>
+              </div>
+            </div>
+
+            <div class="gallery-card">
+              <div class="gallery-img-wrapper">
+                <img src="school_shoes_1.jpg" class="gallery-img" alt="Regular Shoes">
+              </div>
+              <div class="gallery-info">
+                <div class="gallery-title">School Shoes (Style 1)</div>
+                <div class="gallery-category">Footwear</div>
+              </div>
+            </div>
+
+            <div class="gallery-card">
+              <div class="gallery-img-wrapper">
+                <img src="school_shoes_2.jpg" class="gallery-img" alt="Sports Shoes">
+              </div>
+              <div class="gallery-info">
+                <div class="gallery-title">School Shoes (Style 2)</div>
+                <div class="gallery-category">Footwear</div>
+              </div>
+            </div>
+
+            <div class="gallery-card">
+              <div class="gallery-img-wrapper">
+                <img src="Yoga_Pants.jpg" class="gallery-img" alt="Yoga Pants">
+              </div>
+              <div class="gallery-info">
+                <div class="gallery-title">Yoga Pants</div>
+                <div class="gallery-category">Yoga / 3B Activity</div>
+              </div>
+            </div>
+
+            <div class="gallery-card">
+              <div class="gallery-img-wrapper">
+                <img src="swimming_cap.jpg" class="gallery-img" alt="Swimming Cap">
+              </div>
+              <div class="gallery-info">
+                <div class="gallery-title">Swimming Cap</div>
+                <div class="gallery-category">Swim Gear</div>
+              </div>
+            </div>
+
+            <div class="gallery-card">
+              <div class="gallery-img-wrapper">
+                <img src="swimming_girls_legsuit.jpg" class="gallery-img" alt="Girls Legsuit">
+              </div>
+              <div class="gallery-info">
+                <div class="gallery-title">Girls Swimming Legsuit</div>
+                <div class="gallery-category">Swim Gear</div>
+              </div>
+            </div>
+
+            <div class="gallery-card">
+              <div class="gallery-img-wrapper">
+                <img src="swimming_goggles.jpg" class="gallery-img" alt="Swim Goggles">
+              </div>
+              <div class="gallery-info">
+                <div class="gallery-title">Swimming Goggles</div>
+                <div class="gallery-category">Swim Gear</div>
+              </div>
+            </div>
+
+            <div class="gallery-card">
+              <div class="gallery-img-wrapper">
+                <img src="swimming_shorts.jpg" class="gallery-img" alt="Swim Shorts">
+              </div>
+              <div class="gallery-info">
+                <div class="gallery-title">Swimming Shorts</div>
+                <div class="gallery-category">Swim Gear</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </section>
+
+      <!-- Right Column: Sidebar (Policy Rules & Vendor Info) -->
+      <aside>
+
+        <!-- Policy & Rules Card -->
+        <div class="widget-card" id="policy-section">
+          <div class="widget-title">
+            <i class="fa-solid fa-scale-balanced"></i> Dress Code Policies
+          </div>
+          <ul class="policy-list">
+            <li class="policy-item">
+              <i class="fa-solid fa-circle-exclamation"></i>
+              <div>
+                <strong>Mandatory ID Cards:</strong>
+                <p style="font-size:0.85rem; color:var(--gray);">Must be worn daily by students of Classes I to XI, for
+                  external events and examinations.</p>
+              </div>
+            </li>
+            <li class="policy-item">
+              <i class="fa-solid fa-circle-check"></i>
+              <div>
+                <strong>Saturday Events:</strong>
+                <p style="font-size:0.85rem; color:var(--gray);">Wear Wednesday's <strong>White T-Shirt</strong> uniform
+                  for PTMs/events.</p>
+              </div>
+            </li>
+            <li class="policy-item">
+              <i class="fa-solid fa-venus"></i>
+              <div>
+                <strong>Girls Dress Rules:</strong>
+                <p style="font-size:0.85rem; color:var(--gray);">Must wear tights under uniforms & slips over shirts. No
+                  colourful jackets, rings, earrings, bangles, mehndi, or nail polish.</p>
+              </div>
+            </li>
+            <li class="policy-item">
+              <i class="fa-solid fa-mars"></i>
+              <div>
+                <strong>Boys Dress Rules:</strong>
+                <p style="font-size:0.85rem; color:var(--gray);">No colourful jackets or unusual hairstyles. Khada
+                  (silver bangle) is allowed only for Sikh boys (must not cause harm). No jewelry.</p>
+              </div>
+            </li>
+            <li class="policy-item">
+              <i class="fa-solid fa-snowflake"></i>
+              <div>
+                <strong>Winter Wear:</strong>
+                <p style="font-size:0.85rem; color:var(--gray);">Only school-prescribed sweaters allowed. Must be
+                  pre-ordered in May. No hoodies or alternative jackets.</p>
+              </div>
+            </li>
+            <li class="policy-item">
+              <i class="fa-solid fa-child-reaching"></i>
+              <div>
+                <strong>Yoga Attire:</strong>
+                <p style="font-size:0.85rem; color:var(--gray);">Only school-prescribed yoga pants allowed (must change
+                  after class). Permitted under uniform Dec-Jan.</p>
+              </div>
+            </li>
+            <li class="policy-item">
+              <i class="fa-solid fa-clock"></i>
+              <div>
+                <strong>Watches & Caps:</strong>
+                <p style="font-size:0.85rem; color:var(--gray);">Only analog watches are allowed; no expensive/digital
+                  watches. Only school-prescribed dark blue synthetic caps are allowed for travel (remove upon entry).
+                </p>
+              </div>
+            </li>
+            <li class="policy-item">
+              <i class="fa-solid fa-gift"></i>
+              <div>
+                <strong>Birthdays & Gifts:</strong>
+                <p style="font-size:0.85rem; color:var(--gray);">There should be no exchange of gifts for birthdays and
+                  friendship days in the school.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Vendor & Purchase Info Card -->
+        <div class="widget-card" id="vendors-section">
+          <div class="widget-title">
+            <i class="fa-solid fa-store"></i> Authorized Vendors
+          </div>
+
+          <div class="vendor-card">
+            <div class="vendor-name"><i class="fa-solid fa-tag"></i> Scribbles</div>
+            <div class="vendor-items">Uniforms, Tie, Belt, Tights, Slips</div>
+          </div>
+
+          <div class="vendor-card">
+            <div class="vendor-name"><i class="fa-solid fa-tag"></i> Sports 365</div>
+            <div class="vendor-items">Shoes, Socks, Sweaters, Yoga Pants, Swim Gear</div>
+          </div>
+
+          <div class="vendor-card">
+            <div class="vendor-name"><i class="fa-solid fa-tag"></i> Hawk Sports</div>
+            <div class="vendor-items">House T-Shirts</div>
+          </div>
+
+          <button class="btn-edchemy" onclick="window.open('https://kumarans.edchemy.com', '_blank')">
+            <i class="fa-solid fa-cart-shopping"></i> Order Online on Edchemy
+          </button>
+        </div>
+
+      </aside>
+
+    </div>
+  </div>
+
+  <!-- Footer with Developer contact to replicate index.html style -->
+  <footer>
+    <div class="container">
+      <p style="font-weight:700; font-size:1.1rem; margin-bottom:0.5rem; font-family:'Outfit';">Kumarans | Uniform
+        Planner Portal</p>
+      <p style="font-size:0.85rem; opacity:0.8;">Helper tool designed for Kumarans parents and students</p>
+
+      <div class="footer-divider"></div>
+
+      <div class="footer-contacts">
+        <div class="footer-contact-item">
+          <i class="fa-brands fa-whatsapp"></i>
+          <a href="https://wa.me/+919886138881?text=Hi, Regarding the Wednesday T shirt Portal" target="_blank">
+            Chandrashekar SK (Ansh - 4B)
+          </a>
+        </div>
+        <div class="footer-contact-item">
+          <i class="fa-solid fa-envelope"></i>
+          <a href="mailto:csk007@gmail.com?subject=Kumarans Wednesday Tshirt Info Portal&body=Hey Hi,">
+            csk007@gmail.com
+          </a>
+        </div>
+        <div class="footer-contact-item">
+          <i class="fa-solid fa-code-branch"></i>
+          <span>Created: 2022 | Updated: 2026</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Script Logic -->
+  <script>
+    // Constants from original index.html logic
+    const ordinalShort = ['1st', '2nd', '3rd', '4th', '5th'];
+    const tshirtTypes = ['House', 'White', 'House', 'White', 'House'];
+    const houseTshirtImg = 'https://5.imimg.com/data5/SELLER/Default/2023/4/300100634/AT/DI/XH/90786645/ganga-house-t-shirt-500x500.png';
+    const whiteTshirtImg = 'https://cdn.storehippo.com/s/5997cc7c4d6e8ffa20e50aae/ms.products/5aa0f01491c2e5ab32f33874/images/5aa0f01491c2e5ab32f33875/5aa0f02091c2e5ab32f338b4/5aa0f02091c2e5ab32f338b4-640x640.jpg';
+
+    // Global selected states
+    let currentSelectedDay = 'monday';
+    let currentSelectedClass = 'classes-1-3';
+    let currentSimulatedWednesday = null; // Holds Date object of wednesday being previewed
+
+    // On DOM Load
+    window.addEventListener('DOMContentLoaded', () => {
+      // 1. Replicate placeholder layouts for Tuesday, Thursday, Friday (same as Monday)
+      replicateMondayLayout();
+
+      // 2. Compute date details and active today day
+      initDateLogic();
+
+      // 3. Setup event listeners
+      setupResponsiveToggles();
+    });
+
+    // Replicates Monday cards into placeholder divs for other regular days
+    function replicateMondayLayout() {
+      const daysToReplicate = ['tuesday', 'thursday', 'friday'];
+      const classes = ['1-3', '4-7', '8-11'];
+
+      daysToReplicate.forEach(day => {
+        classes.forEach(cls => {
+          const source = document.getElementById(`monday-classes-${cls}`);
+          const target = document.getElementById(`${day}-classes-${cls}`);
+          if (source && target) {
+            target.innerHTML = source.innerHTML;
+          }
+        });
+      });
+    }
+
+    // Handles dynamic dates, greeting generation, and automatic active day selection
+    function initDateLogic() {
+      const now = new Date();
+      const localTimeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const currentDayIndex = now.getDay(); // 0 = Sunday, 1 = Monday, ... 6 = Saturday
+      const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+      const todayName = dayNames[currentDayIndex];
+
+      // Update greeting text based on time
+      let greeting = 'Hello, Kumaranites!';
+      const hour = now.getHours();
+      if (hour < 12) greeting = 'Good morning, Kumaranites! ☀️';
+      else if (hour < 17) greeting = 'Good afternoon, Kumaranites! 🌤️';
+      else greeting = 'Good evening, Kumaranites! 🌙';
+
+      document.getElementById('greeting-text').innerText = `${greeting} (It's ${localTimeStr})`;
+
+      // Calculate upcoming or current Wednesday
+      const targetWednesday = getUpcomingWednesday(now);
+      currentSimulatedWednesday = targetWednesday; // Set default preview to the calculated wednesday
+
+      // Update Wednesday dynamic cards using this date
+      updateWednesdayUI(targetWednesday);
+
+      // Populate Wednesday preview buttons for the current month
+      populateWednesdayPreviewButtons(targetWednesday);
+
+      // Automatically determine what day tab to highlight
+      let dayToHighlight = 'monday'; // Fallback
+      if (currentDayIndex === 0) {
+        // Sunday: holiday, highlight Monday
+        dayToHighlight = 'monday';
+      } else {
+        dayToHighlight = todayName;
+      }
+
+      // Add visual badge "TODAY" to the correct tab button
+      if (currentDayIndex >= 1 && currentDayIndex <= 6) {
+        const tabBtn = document.getElementById(`tab-${todayName}`);
+        if (tabBtn) tabBtn.classList.add('today-indicator');
+        const accBtn = document.getElementById(`acc-${todayName}`);
+        if (accBtn) accBtn.classList.add('today-indicator');
+      }
+
+      // Compute quick summary text for the header
+      let summaryText = '';
+      if (todayName === 'sunday') {
+        summaryText = "Weekend! Next uniform is Monday's Regular Blue attire.";
+      } else if (todayName === 'wednesday') {
+        const index = getWednesdayIndexInMonth(now);
+        const type = tshirtTypes[index];
+        summaryText = `Today is Wednesday: wear ${type} T-Shirt!`;
+      } else if (todayName === 'saturday') {
+        summaryText = "Saturday: wear Wednesday's White T-Shirt.";
+      } else {
+        summaryText = "Today's Dress Code: Regular Blue shirt & trousers/skirt.";
+      }
+      document.getElementById('live-uniform-summary').innerText = summaryText;
+
+      // Select default day and default class
+      switchDay(dayToHighlight);
+      switchClass('classes-1-3');
+    }
+
+    // Wednesday calculation logic
+    function getUpcomingWednesday(refDate) {
+      const d = new Date(refDate);
+      const day = d.getDay();
+
+      // If Wednesday or earlier, go to Wednesday of this week
+      if (day <= 3) {
+        d.setDate(d.getDate() + (3 - day));
+      } else {
+        // Go to next week's Wednesday
+        d.setDate(d.getDate() + (10 - day));
+      }
+      return d;
+    }
+
+    // Calculates index of the Wednesday in its month (0-indexed)
+    function getWednesdayIndexInMonth(wedDate) {
+      const year = wedDate.getFullYear();
+      const month = wedDate.getMonth();
+
+      // Set to the first day of that month
+      let d = new Date(year, month, 1);
+      // Scan for the first Wednesday
+      while (d.getDay() !== 3) {
+        d.setDate(d.getDate() + 1);
+      }
+
+      let index = 0;
+      while (d.getDate() !== wedDate.getDate()) {
+        d.setDate(d.getDate() + 7);
+        index++;
+      }
+      return index;
+    }
+
+    // Updates all Wednesday UI components based on target Date
+    function updateWednesdayUI(wedDate) {
+      const wedIndex = getWednesdayIndexInMonth(wedDate);
+      const tshirtName = tshirtTypes[wedIndex];
+      const ordinalName = ordinalShort[wedIndex];
+      const isHouse = (wedIndex % 2 === 0); // 0, 2, 4 are House, 1, 3 are White
+      const tshirtImg = isHouse ? houseTshirtImg : whiteTshirtImg;
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      const formattedDate = wedDate.toLocaleDateString('en-IN', options);
+
+      // Update Sub-text under the tab button
+      document.getElementById('tab-wed-sub').innerText = `${tshirtName} T-Shirt`;
+
+      // Update Dynamic banner in Wednesday tab
+      document.getElementById('wed-banner-title').innerText = `Wednesday Attire: ${tshirtName} T-Shirt`;
+      document.getElementById('wed-banner-desc').innerHTML = `Calculated Wednesday Date: <strong>${formattedDate}</strong> (${ordinalName} Wednesday of the month).`;
+      document.getElementById('wed-banner-img').src = tshirtImg;
+      document.getElementById('wed-banner-img').alt = `${tshirtName} T-Shirt`;
+      document.getElementById('wed-active-title').innerText = `${tshirtName} T-Shirt & ${isHouse ? 'Checked/Grey Shorts & Skirt' : 'Steel Grey Shorts/Skirt/Trousers'}`;
+      document.getElementById('wed-active-desc').innerText = isHouse
+        ? 'Worn on 1st, 3rd, and 5th Wednesdays of the month.'
+        : 'Worn on 2nd and 4th Wednesdays of the month.';
+
+      // Update all .dynamic-tshirt-text labels inside the cards
+      const labels = document.querySelectorAll('.dynamic-tshirt-text');
+      labels.forEach(lbl => {
+        lbl.innerText = `${tshirtName} T-Shirt`;
+      });
+    }
+
+    // Populates selector buttons for all Wednesdays in the current month
+    function populateWednesdayPreviewButtons(currentWed) {
+      const year = currentWed.getFullYear();
+      const month = currentWed.getMonth();
+      const monthName = currentWed.toLocaleDateString('en-IN', { month: 'long' });
+
+      document.getElementById('current-month-name').innerText = `${monthName} ${year}`;
+
+      // Get all Wednesdays in this month
+      let d = new Date(year, month, 1);
+      while (d.getDay() !== 3) {
+        d.setDate(d.getDate() + 1);
+      }
+
+      const listContainer = document.getElementById('wednesdays-of-month-list');
+      listContainer.innerHTML = ''; // Clear
+
+      let index = 0;
+      while (d.getMonth() === month) {
+        const wedDate = new Date(d.getTime());
+        const activeIndex = index;
+        const ordinal = ordinalShort[activeIndex];
+        const type = tshirtTypes[activeIndex];
+        const dateNum = wedDate.getDate();
+
+        const btn = document.createElement('button');
+        btn.className = 'wednesday-opt-btn';
+        if (wedDate.getDate() === currentWed.getDate()) {
+          btn.classList.add('active');
+        }
+
+        btn.innerHTML = `${ordinal} Wed (${dateNum})<span class="opt-tshirt">${type}</span>`;
+        btn.addEventListener('click', () => {
+          // Deactivate previous active options
+          document.querySelectorAll('.wednesday-opt-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+
+          // Update Wednesday UI
+          currentSimulatedWednesday = wedDate;
+          updateWednesdayUI(wedDate);
+        });
+
+        listContainer.appendChild(btn);
+
+        d.setDate(d.getDate() + 7);
+        index++;
+      }
+    }
+
+    // Handles Day Switcher logic (Desktop)
+    function switchDay(dayId) {
+      currentSelectedDay = dayId;
+
+      // Deactivate all tab buttons and panels
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.day-panel').forEach(panel => panel.classList.remove('active'));
+      document.querySelectorAll('.accordion-header').forEach(header => header.classList.remove('active'));
+
+      // Activate selected tab and panel
+      const targetTab = document.getElementById(`tab-${dayId}`);
+      const targetPanel = document.getElementById(`panel-${dayId}`);
+      const targetAcc = document.getElementById(`acc-${dayId}`);
+
+      if (targetTab) targetTab.classList.add('active');
+      if (targetPanel) targetPanel.classList.add('active');
+      if (targetAcc) targetAcc.classList.add('active');
+
+      // Scroll view smoothly to planner on mobile if triggered by clicks
+      if (window.innerWidth < 768) {
+        targetAcc.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      // Re-trigger the active class-level view inside this panel
+      switchClass(currentSelectedClass);
+    }
+
+    // Toggle Accordion (Mobile View)
+    function toggleAccordion(dayId) {
+      const header = document.getElementById(`acc-${dayId}`);
+      const panel = document.getElementById(`panel-${dayId}`);
+
+      const isAlreadyActive = header.classList.contains('active');
+
+      // Collapse all
+      document.querySelectorAll('.accordion-header').forEach(h => h.classList.remove('active'));
+      document.querySelectorAll('.day-panel').forEach(p => p.classList.remove('active'));
+
+      // Deactivate tabs to match
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+
+      if (!isAlreadyActive) {
+        header.classList.add('active');
+        panel.classList.add('active');
+
+        // Sync desktop tab selection
+        const tab = document.getElementById(`tab-${dayId}`);
+        if (tab) tab.classList.add('active');
+
+        currentSelectedDay = dayId;
+        switchClass(currentSelectedClass);
+
+        setTimeout(() => {
+          header.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 150);
+      }
+    }
+
+    // Handles Class Filter toggle
+    function switchClass(classId) {
+      currentSelectedClass = classId;
+
+      // Toggle active states on class pills
+      document.querySelectorAll('.class-pill').forEach(pill => pill.classList.remove('active'));
+      const activePill = document.getElementById(`pill-${classId}`);
+      if (activePill) activePill.classList.add('active');
+
+      // Hide all class sections within ALL panels
+      document.querySelectorAll('.class-uniform-section').forEach(sect => {
+        sect.classList.remove('active');
+      });
+
+      // Show the selected class level section in the CURRENT day panel
+      const targetSect = document.getElementById(`${currentSelectedDay}-${classId}`);
+      if (targetSect) {
+        targetSect.classList.add('active');
+      }
+    }
+
+    // Setup event listeners for window resize (responsive synchronization)
+    function setupResponsiveToggles() {
+      window.addEventListener('resize', () => {
+        // If we switch back to desktop width, make sure a tab and panel are active
+        if (window.innerWidth >= 768) {
+          const activePanel = document.querySelector('.day-panel.active');
+          if (!activePanel) {
+            switchDay(currentSelectedDay);
+          }
+        }
+      });
+    }
+  </script>
+</body>
+
+</html>
