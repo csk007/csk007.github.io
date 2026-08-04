@@ -17,16 +17,16 @@
   <style>
     /* Premium CSS Theme Variables */
     :root {
-      --primary: #1e3a8a;
-      /* Deep Navy */
-      --primary-light: #3b82f6;
-      /* Blue Accent */
-      --primary-bg: #eff6ff;
-      /* Light Navy Tint */
-      --secondary: #d97706;
-      /* School Amber/Gold */
-      --secondary-bg: #fef3c7;
-      /* Light Amber Tint */
+      --primary: #A6093D;
+      /* Kumarans Crimson Red */
+      --primary-light: #c0124a;
+      /* Crimson Accent */
+      --primary-bg: #fff1f2;
+      /* Light Crimson Tint */
+      --secondary: #00205b;
+      /* Kumarans Navy Blue */
+      --secondary-bg: #f0f4f8;
+      /* Light Navy/Blue-Gray Tint */
       --dark: #0f172a;
       /* Slate Dark */
       --gray: #475569;
@@ -36,8 +36,8 @@
       --white: #ffffff;
       --border: #e2e8f0;
 
-      --gradient-primary: linear-gradient(135deg, #1e3b8b 0%, #3b82f6 100%);
-      --gradient-amber: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+      --gradient-primary: linear-gradient(135deg, #A6093D 0%, #c0124a 100%);
+      --gradient-amber: linear-gradient(135deg, #00205b 0%, #1e3a8a 100%);
       --gradient-card-boys: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
       --gradient-card-girls: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%);
 
@@ -96,7 +96,7 @@
     header {
       background: var(--gradient-primary);
       color: var(--white);
-      padding: 3rem 0;
+      padding: 1.25rem 0;
       border-radius: 0 0 var(--radius-xl) var(--radius-xl);
       box-shadow: var(--shadow-lg);
       margin-bottom: 2rem;
@@ -148,14 +148,14 @@
     }
 
     header h1 {
-      font-size: 2.5rem;
+      font-size: 1.8rem;
       letter-spacing: -0.02em;
     }
 
     .header-subtitle {
-      font-size: 1.1rem;
+      font-size: 0.95rem;
       opacity: 0.9;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
     }
 
     /* Greeting & Live Summary Bar */
@@ -163,7 +163,7 @@
       background: rgba(255, 255, 255, 0.1);
       backdrop-filter: blur(10px);
       border-radius: var(--radius-lg);
-      padding: 1rem 1.5rem;
+      padding: 0.6rem 1.25rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -180,7 +180,7 @@
     }
 
     .live-greeting i {
-      color: var(--secondary);
+      color: #fbbf24;
       animation: pulse 2s infinite;
     }
 
@@ -456,7 +456,7 @@
     }
 
     .attire-card-boys {
-      border-left: 6px solid var(--primary-light);
+      border-left: 6px solid #0eb4d8;
     }
 
     .attire-card-girls {
